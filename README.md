@@ -25,6 +25,7 @@ A comprehensive payment repository management microservice that serves as the ce
 - [Data Model](#data-model)
   - [Entity Relationship Diagram](#entity-relationship-diagram)
   - [Core Entities](#core-entities)
+- [Native repository tests](docs/native-repository-tests.md)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Building the Service](#building-the-service)

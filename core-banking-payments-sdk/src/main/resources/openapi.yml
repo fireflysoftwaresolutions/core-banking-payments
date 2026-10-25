@@ -6,12 +6,12 @@ servers:
 - url: http://localhost:18080
   description: Generated server url
 tags:
-- name: DirectDebitMandate
-  description: Stored direct-debit mandate. Not a scheme clearing file.
 - name: Payment Compliance
   description: APIs for managing payment compliance information
 - name: Payment Exchange Rates
   description: APIs for managing payment exchange rates
+- name: DirectDebitMandate
+  description: Stored direct-debit mandate. Not a scheme clearing file.
 - name: Payment Correspondence
   description: APIs for managing payment correspondence
 - name: Payment Audit
@@ -60,8 +60,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -97,8 +99,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -140,8 +144,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -175,8 +181,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -212,8 +220,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -255,8 +265,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -290,8 +302,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -327,8 +341,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -370,8 +386,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -405,8 +423,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -442,8 +462,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -485,8 +507,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -520,8 +544,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -557,8 +583,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -600,8 +628,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -635,8 +665,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -672,8 +704,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -715,8 +749,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -749,8 +785,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -786,8 +824,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -829,8 +869,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -863,8 +905,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -900,8 +944,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -943,8 +989,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -977,8 +1025,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1020,8 +1070,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1052,8 +1104,10 @@ paths:
           type: string
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1093,8 +1147,10 @@ paths:
           type: string
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1124,8 +1180,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1154,8 +1212,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1189,8 +1249,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1216,8 +1278,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1246,8 +1310,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1281,8 +1347,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1314,8 +1382,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1345,8 +1415,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1375,8 +1447,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1411,8 +1485,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1421,6 +1497,544 @@ paths:
           description: Successfully deleted beneficiary
         "404":
           description: Beneficiary not found
+  /api/v1/tenants/{tenant}/internal-payments:
+    post:
+      tags:
+      - ManagedPayments
+      operationId: createManagedPayment
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Create"
+        required: true
+      responses:
+        "200":
+          description: Current authorized payment receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "201":
+          description: New durable payment instruction recorded; no financial effect
+            implied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/recovery:
+    post:
+      tags:
+      - ManagedPayments
+      operationId: recoverManagedPayment
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Recovery"
+        required: true
+      responses:
+        "200":
+          description: Current authorized payment receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "202":
+          description: Recovery scheduled with a durable pending participant effect
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/failures:
+    post:
+      tags:
+      - ManagedPayments
+      operationId: recordManagedPaymentFailure
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Failure"
+        required: true
+      responses:
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "200":
+          description: Current authorized receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/decisions:
+    post:
+      tags:
+      - ManagedPayments
+      operationId: decideManagedPayment
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Decision"
+        required: true
+      responses:
+        "200":
+          description: Current authorized payment receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "202":
+          description: Decision recorded with a durable pending participant effect
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/claims:
+    post:
+      tags:
+      - ManagedPayments
+      operationId: claimManagedPaymentEffect
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Claim"
+        required: true
+      responses:
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EffectClaim"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EffectClaim"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EffectClaim"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EffectClaim"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EffectClaim"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EffectClaim"
+        "200":
+          description: Current authorized receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EffectClaim"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/acknowledgments:
+    post:
+      tags:
+      - ManagedPayments
+      operationId: acknowledgeManagedPaymentEffect
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Acknowledge"
+        required: true
+      responses:
+        "200":
+          description: Current authorized payment receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "202":
+          description: The exact financial outcome still requires recovery
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/accounts/{accountId}/quiescence:
+    post:
+      tags:
+      - PaymentAccountQuiescence
+      summary: Retain an internal-payment intake fence; no business account closure
+      operationId: quiesceManagedPaymentsForAccount
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Quiesce"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuiescenceReceipt"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/accounts/{accountId}/quiescence/release:
+    post:
+      tags:
+      - PaymentAccountQuiescence
+      summary: Explicitly release a retained fence under current authority and CAS
+      operationId: releaseManagedPaymentAccountQuiescence
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Release"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReleaseReceipt"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/standing-order-runs:
+    post:
+      tags:
+      - StandingOrderRun
+      summary: Store a standing-order run
+      operationId: runStandingOrder
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StandingOrderRunDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/StandingOrderRunDTO"
   /api/v1/payment-orders/{paymentOrderId}/schedules:
     get:
       tags:
@@ -1490,8 +2104,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1520,8 +2136,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1608,8 +2226,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1638,8 +2258,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1726,8 +2348,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1756,8 +2380,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1844,8 +2470,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1874,8 +2502,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1962,8 +2592,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -1992,8 +2624,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2080,8 +2714,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2110,8 +2746,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2198,8 +2836,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2228,8 +2868,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2317,8 +2959,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2347,8 +2991,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2435,8 +3081,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2465,8 +3113,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2547,8 +3197,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2570,8 +3222,10 @@ paths:
       parameters:
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2651,8 +3305,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2674,8 +3330,10 @@ paths:
       parameters:
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2767,8 +3425,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2790,8 +3450,10 @@ paths:
       parameters:
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2810,6 +3472,417 @@ paths:
                 $ref: "#/components/schemas/PaymentBeneficiaryDTO"
         "400":
           description: Invalid input
+  /api/v1/direct-debit-mandates:
+    post:
+      tags:
+      - DirectDebitMandate
+      summary: Store a direct-debit mandate
+      operationId: createDirectDebitMandate
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DirectDebitMandateDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DirectDebitMandateDTO"
+  /api/v1/direct-debit-collections:
+    post:
+      tags:
+      - DirectDebitCollection
+      summary: Store a direct-debit collection
+      operationId: collectDirectDebit
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DirectDebitCollectionDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DirectDebitCollectionDTO"
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}:
+    get:
+      tags:
+      - ManagedPayments
+      operationId: getManagedPayment
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "200":
+          description: Current authorized receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/history:
+    get:
+      tags:
+      - ManagedPayments
+      operationId: managedPaymentHistory
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: afterVersion
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          default: -1
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEvent"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEvent"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEvent"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEvent"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEvent"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEvent"
+        "200":
+          description: Bounded authorized payment history
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEvent"
+      security:
+      - managedPaymentBearer: []
+  /api/v1/tenants/{tenant}/internal-payments/recovery:
+    get:
+      tags:
+      - ManagedPayments
+      operationId: managedPaymentRecoveryQueue
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: afterId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Invalid or unsupported managed payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecoveryPage"
+        "401":
+          description: A trusted current bearer token is required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecoveryPage"
+        "403":
+          description: Current action or exact account authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecoveryPage"
+        "404":
+          description: No payment is visible to the current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecoveryPage"
+        "409":
+          description: "Immutable intent, version, effect, or lease conflict"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecoveryPage"
+        "503":
+          description: Required runtime or delegated peer authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecoveryPage"
+        "200":
+          description: Current authorized receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecoveryPage"
+      security:
+      - managedPaymentBearer: []
+  /api/v1/tenants/{tenant}/internal-payments/accounts/{accountId}/quiescence/{closureId}:
+    get:
+      tags:
+      - PaymentAccountQuiescence
+      summary: Read current authorized retained fence progress
+      operationId: getManagedPaymentAccountQuiescence
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: closureId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentAccountQuiescenceView"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/accounts/{accountId}/quiescence/{closureId}/obligations:
+    get:
+      tags:
+      - PaymentAccountQuiescence
+      summary: Capture or page a complete retained managed-payment observation
+      operationId: getManagedPaymentAccountObligations
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: closureId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: observationId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: after
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          default: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ObligationPage"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/standing-order-runs/{runId}:
+    get:
+      tags:
+      - StandingOrderRun
+      summary: Read a standing-order run
+      operationId: getStandingOrderRun
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/StandingOrderRunDTO"
   /api/v1/payment-orders/{paymentOrderId}/instructions/{paymentInstructionId}/audit:
     get:
       tags:
@@ -2886,8 +3959,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -2975,8 +4050,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -3058,8 +4135,10 @@ paths:
           type: boolean
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -3094,8 +4173,10 @@ paths:
           type: string
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -3108,6 +4189,56 @@ paths:
                 $ref: "#/components/schemas/PaymentExchangeRateDTO"
         "400":
           description: Invalid input
+  /api/v1/direct-debit-mandates/{mandateId}:
+    get:
+      tags:
+      - DirectDebitMandate
+      summary: Read a direct-debit mandate
+      operationId: getDirectDebitMandate
+      parameters:
+      - name: mandateId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DirectDebitMandateDTO"
+  /api/v1/direct-debit-collections/{collectionId}:
+    get:
+      tags:
+      - DirectDebitCollection
+      summary: Read a direct-debit collection
+      operationId: getDirectDebitCollection
+      parameters:
+      - name: collectionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DirectDebitCollectionDTO"
   /api/v1/audit/{paymentAuditId}:
     get:
       tags:
@@ -3125,8 +4256,10 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
-        description: "Unique key for idempotent requests. If provided, ensures that\
-          \ identical requests with the same key will only be processed once."
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
@@ -3139,142 +4272,8 @@ paths:
                 $ref: "#/components/schemas/PaymentAuditDTO"
         "404":
           description: Audit record not found
-  /api/v1/direct-debit-mandates:
-    post:
-      tags: [DirectDebitMandate]
-      summary: Store a direct-debit mandate
-      operationId: createDirectDebitMandate
-      parameters:
-      - name: X-Idempotency-Key
-        in: header
-        required: false
-        schema: {type: string}
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/DirectDebitMandateDTO"}
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/DirectDebitMandateDTO"}
-  /api/v1/direct-debit-mandates/{mandateId}:
-    get:
-      tags: [DirectDebitMandate]
-      summary: Read a direct-debit mandate
-      operationId: getDirectDebitMandate
-      parameters:
-      - name: mandateId
-        in: path
-        required: true
-        schema: {type: string, format: uuid}
-      - name: X-Idempotency-Key
-        in: header
-        required: false
-        schema: {type: string}
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/DirectDebitMandateDTO"}
-  /api/v1/direct-debit-collections:
-    post:
-      tags: [DirectDebitCollection]
-      summary: Store a direct-debit collection
-      operationId: collectDirectDebit
-      parameters:
-      - {name: X-Idempotency-Key, in: header, required: false, schema: {type: string}}
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/DirectDebitCollectionDTO"}
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/DirectDebitCollectionDTO"}
-  /api/v1/direct-debit-collections/{collectionId}:
-    get:
-      tags: [DirectDebitCollection]
-      summary: Read a direct-debit collection
-      operationId: getDirectDebitCollection
-      parameters:
-      - {name: collectionId, in: path, required: true, schema: {type: string, format: uuid}}
-      - {name: X-Idempotency-Key, in: header, required: false, schema: {type: string}}
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/DirectDebitCollectionDTO"}
-  /api/v1/standing-order-runs:
-    post:
-      tags: [StandingOrderRun]
-      summary: Store a standing-order run
-      operationId: runStandingOrder
-      parameters:
-      - {name: X-Idempotency-Key, in: header, required: false, schema: {type: string}}
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/StandingOrderRunDTO"}
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/StandingOrderRunDTO"}
-  /api/v1/standing-order-runs/{runId}:
-    get:
-      tags: [StandingOrderRun]
-      summary: Read a standing-order run
-      operationId: getStandingOrderRun
-      parameters:
-      - {name: runId, in: path, required: true, schema: {type: string, format: uuid}}
-      - {name: X-Idempotency-Key, in: header, required: false, schema: {type: string}}
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/StandingOrderRunDTO"}
 components:
   schemas:
-    DirectDebitMandateDTO:
-      type: object
-      properties:
-        directDebitMandateId: {type: string, format: uuid}
-        debtorAccountId: {type: string, format: uuid}
-        creditorPartyId: {type: string, format: uuid}
-        status: {type: string, enum: [ACTIVE, SUSPENDED, CANCELLED]}
-        amountLimit: {type: number}
-        currency: {type: string, minLength: 3, maxLength: 3}
-        reference: {type: string}
-    DirectDebitCollectionDTO:
-      type: object
-      properties:
-        directDebitCollectionId: {type: string, format: uuid}
-        directDebitMandateId: {type: string, format: uuid}
-        amount: {type: number}
-        currency: {type: string, minLength: 3, maxLength: 3}
-        valueDate: {type: string, format: date}
-        status: {type: string}
-    StandingOrderRunDTO:
-      type: object
-      properties:
-        standingOrderRunId: {type: string, format: uuid}
-        paymentScheduleId: {type: string, format: uuid}
-        amount: {type: number}
-        currency: {type: string, minLength: 3, maxLength: 3}
-        valueDate: {type: string, format: date}
-        nextExecutionDate: {type: string, format: date}
-        executionCount: {type: integer}
     PaymentScheduleDTO:
       required:
       - amount
@@ -4185,6 +5184,524 @@ components:
           maxLength: 100
           minLength: 0
           type: string
+    Create:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        sourceAccountId:
+          type: string
+          format: uuid
+        destinationAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        ttlSeconds:
+          type: integer
+          format: int32
+        customerNotAfterEpochMillis:
+          type: integer
+          format: int64
+      additionalProperties: false
+    View:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        createActionId:
+          type: string
+          format: uuid
+        tenant:
+          type: string
+        sourceAccountId:
+          type: string
+          format: uuid
+        destinationAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: string
+        currency:
+          type: string
+        currencyScale:
+          type: integer
+          format: int32
+        currencyPolicy:
+          type: string
+        ttlSeconds:
+          type: integer
+          format: int32
+        customerNotAfterEpochMillis:
+          type: integer
+          format: int64
+        notAfterEpochMillis:
+          type: integer
+          format: int64
+        initiator:
+          type: string
+        state:
+          type: string
+          enum:
+          - RECEIVED
+          - RESERVING
+          - RESERVED
+          - COMMITTING
+          - CANCELLING
+          - COMPLETED
+          - REVERSED
+          - CANCELLED
+          - EXPIRED
+          - RECOVERY_REQUIRED
+        version:
+          type: integer
+          format: int64
+        reservationId:
+          type: string
+          format: uuid
+        postingId:
+          type: string
+          format: uuid
+        reversalId:
+          type: string
+          format: uuid
+        absenceReceiptId:
+          type: string
+          format: uuid
+        ledgerVersion:
+          type: integer
+          format: int64
+        observedAt:
+          type: string
+          format: date-time
+        pendingEffectId:
+          type: string
+          format: uuid
+        recoveryCode:
+          type: string
+        ledgerState:
+          type: string
+        reservationExpiresAt:
+          type: string
+          format: date-time
+    Recovery:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        expectedVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    Failure:
+      type: object
+      properties:
+        effectId:
+          type: string
+          format: uuid
+        fence:
+          type: integer
+          format: int64
+        expectedVersion:
+          type: integer
+          format: int64
+        code:
+          type: string
+          enum:
+          - TRANSPORT_UNAVAILABLE
+          - OBSERVATION_UNAVAILABLE
+          - PEER_REJECTED
+          - INCONSISTENT_OBSERVATION
+          - RETRY_EXHAUSTED
+      additionalProperties: false
+    Decision:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - CONFIRM
+          - CANCEL
+        expectedVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    Claim:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        expectedVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    EffectClaim:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        effectId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - RESERVE
+          - COMMIT
+          - RELEASE
+          - OBSERVE
+        participantActionId:
+          type: string
+          format: uuid
+        fence:
+          type: integer
+          format: int64
+        leaseUntil:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+        payment:
+          $ref: "#/components/schemas/View"
+    Acknowledge:
+      type: object
+      properties:
+        effectId:
+          type: string
+          format: uuid
+        fence:
+          type: integer
+          format: int64
+        expectedVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    Quiesce:
+      required:
+      - actionId
+      - closureId
+      - enrollmentId
+      - expectedFenceVersion
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        closureId:
+          type: string
+          format: uuid
+        enrollmentId:
+          type: string
+          format: uuid
+        expectedFenceVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    QuiescenceReceipt:
+      type: object
+      properties:
+        fenceId:
+          type: string
+          format: uuid
+        actionId:
+          type: string
+          format: uuid
+        closureId:
+          type: string
+          format: uuid
+        selection:
+          $ref: "#/components/schemas/Selection"
+        fenceVersion:
+          type: integer
+          format: int64
+        observedSourceVersion:
+          type: integer
+          format: int64
+        observedLedgerVersion:
+          type: integer
+          format: int64
+        acceptedAt:
+          type: string
+          format: date-time
+    Selection:
+      type: object
+      properties:
+        tenantId:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        enrollmentId:
+          type: string
+          format: uuid
+        contractId:
+          type: string
+          format: uuid
+        currency:
+          type: string
+        currencyScale:
+          type: integer
+          format: int32
+        currencyPolicy:
+          type: string
+    Release:
+      required:
+      - actionId
+      - closureId
+      - expectedFenceVersion
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        closureId:
+          type: string
+          format: uuid
+        expectedFenceVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    ReleaseReceipt:
+      type: object
+      properties:
+        fenceId:
+          type: string
+          format: uuid
+        actionId:
+          type: string
+          format: uuid
+        closureId:
+          type: string
+          format: uuid
+        selection:
+          $ref: "#/components/schemas/Selection"
+        fenceVersion:
+          type: integer
+          format: int64
+        releasedAt:
+          type: string
+          format: date-time
+    StandingOrderRunDTO:
+      type: object
+      properties:
+        standingOrderRunId:
+          type: string
+          format: uuid
+        paymentScheduleId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        valueDate:
+          type: string
+          format: date
+        nextExecutionDate:
+          type: string
+          format: date
+        executionCount:
+          type: integer
+          format: int32
+    DirectDebitMandateDTO:
+      type: object
+      properties:
+        directDebitMandateId:
+          type: string
+          format: uuid
+        debtorAccountId:
+          type: string
+          format: uuid
+        creditorPartyId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - SUSPENDED
+          - CANCELLED
+        amountLimit:
+          type: number
+        currency:
+          type: string
+        reference:
+          type: string
+    DirectDebitCollectionDTO:
+      type: object
+      properties:
+        directDebitCollectionId:
+          type: string
+          format: uuid
+        directDebitMandateId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        valueDate:
+          type: string
+          format: date
+        status:
+          type: string
+    HistoryEvent:
+      type: object
+      properties:
+        version:
+          type: integer
+          format: int64
+        type:
+          type: string
+        actor:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+        actionId:
+          type: string
+          format: uuid
+        effectId:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - RECEIVED
+          - RESERVING
+          - RESERVED
+          - COMMITTING
+          - CANCELLING
+          - COMPLETED
+          - REVERSED
+          - CANCELLED
+          - EXPIRED
+          - RECOVERY_REQUIRED
+        postingId:
+          type: string
+          format: uuid
+        reversalId:
+          type: string
+          format: uuid
+    RecoveryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/View"
+        nextId:
+          type: string
+          format: uuid
+    PaymentAccountQuiescenceView:
+      type: object
+      properties:
+        fenceId:
+          type: string
+          format: uuid
+        closureId:
+          type: string
+          format: uuid
+        selection:
+          $ref: "#/components/schemas/Selection"
+        state:
+          type: string
+          enum:
+          - FENCED
+          - RELEASED
+        fenceVersion:
+          type: integer
+          format: int64
+        observation:
+          type: string
+          enum:
+          - UNKNOWN
+          - OBLIGATIONS
+          - CLEAR
+        observedSourceVersion:
+          type: integer
+          format: int64
+        observationReceiptId:
+          type: string
+          format: uuid
+    Obligation:
+      type: object
+      properties:
+        obligationId:
+          type: string
+          format: uuid
+        ordinal:
+          type: integer
+          format: int64
+        direction:
+          type: string
+        state:
+          type: string
+        effectState:
+          type: string
+        blocking:
+          type: boolean
+        operationVersion:
+          type: integer
+          format: int64
+    ObligationPage:
+      type: object
+      properties:
+        observation:
+          $ref: "#/components/schemas/ObservationReceipt"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Obligation"
+        nextAfter:
+          type: integer
+          format: int64
+    ObservationReceipt:
+      type: object
+      properties:
+        observationId:
+          type: string
+          format: uuid
+        fenceId:
+          type: string
+          format: uuid
+        closureId:
+          type: string
+          format: uuid
+        selection:
+          $ref: "#/components/schemas/Selection"
+        fenceVersion:
+          type: integer
+          format: int64
+        observedSourceVersion:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - UNKNOWN
+          - OBLIGATIONS
+          - CLEAR
+        total:
+          type: integer
+          format: int64
+        obligationCount:
+          type: integer
+          format: int64
+        observedAt:
+          type: string
+          format: date-time
     PaginationResponse:
       type: object
       properties:
@@ -4264,3 +5781,8 @@ components:
           maxLength: 1000
           minLength: 0
           type: string
+  securitySchemes:
+    managedPaymentBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

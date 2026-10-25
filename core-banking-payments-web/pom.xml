@@ -30,6 +30,7 @@
             <artifactId>core-banking-payments-interfaces</artifactId>
         </dependency>
 
+        <dependency><groupId>org.fireflyframework</groupId><artifactId>fireflyframework-security-resource-server</artifactId></dependency>
         <!-- Common Libraries -->
         <dependency>
             <groupId>org.fireflyframework</groupId>
@@ -70,6 +71,9 @@
         </dependency>
 
         <!-- Testing -->
+        <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers-postgresql</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers-junit-jupiter</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId><scope>runtime</scope></dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

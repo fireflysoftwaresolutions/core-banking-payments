@@ -1,54 +1,13 @@
-/*
- * Copyright 2025 Firefly Software Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
 package io.fireflysoftware.core.banking.payments.core.instructions;
 
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Service
-public class PaymentInstructionService {
-
-    private final PaymentTccPort payments;
-
-    public PaymentInstructionService(PaymentTccPort payments) {
-        this.payments = payments;
-    }
-
-    public Mono<UUID> payBeneficiary(PaymentInstructions.BeneficiaryStatus status, BigDecimal amount,
-                                     String currency, String idempotencyKey) {
-        PaymentInstructions.requireActiveBeneficiary(status);
-        return payments.tryPayment(amount, currency, idempotencyKey).flatMap(payments::confirm);
-    }
-
-    public Mono<PaymentInstructions.StandingOrder> runStandingOrder(PaymentInstructions.StandingOrder order,
-                                                                    LocalDate today, String idempotencyKey) {
-        PaymentInstructions.StandingOrder next = PaymentInstructions.executeStandingOrder(order, today);
-        return payments.tryPayment(order.amount(), order.currency(), idempotencyKey)
-                .flatMap(payments::confirm)
-                .thenReturn(next);
-    }
-
-    public Mono<UUID> collectDirectDebit(PaymentInstructions.DirectDebit debit, String idempotencyKey) {
-        PaymentInstructions.requireCollectable(debit);
-        return payments.tryPayment(debit.amount(), debit.currency(), idempotencyKey).flatMap(payments::confirm);
-    }
+public interface PaymentInstructionService {
+    Mono<UUID> payBeneficiary(PaymentInstructions.BeneficiaryStatus status, BigDecimal amount, String currency, String idempotencyKey);
+    Mono<PaymentInstructions.StandingOrder> runStandingOrder(PaymentInstructions.StandingOrder order, LocalDate today, String idempotencyKey);
+    Mono<UUID> collectDirectDebit(PaymentInstructions.DirectDebit debit, String idempotencyKey);
 }

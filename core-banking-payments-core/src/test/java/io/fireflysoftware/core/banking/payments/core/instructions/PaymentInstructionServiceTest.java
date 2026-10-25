@@ -17,6 +17,8 @@
 
 package io.fireflysoftware.core.banking.payments.core.instructions;
 
+import io.fireflysoftware.core.banking.payments.core.instructions.impl.PaymentInstructionServiceImpl;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -27,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PaymentInstructionServiceTest {
 
-    private final PaymentInstructionService service = new PaymentInstructionService(new SandboxPaymentTccAdapter());
+    private final PaymentInstructionService service = new PaymentInstructionServiceImpl(new SandboxPaymentTccAdapter());
 
     @Test
     void activeBeneficiaryIsPaidAndInactiveIsRefused() {
