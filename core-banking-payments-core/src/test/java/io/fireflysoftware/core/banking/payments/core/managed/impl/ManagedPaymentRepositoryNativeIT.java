@@ -18,6 +18,7 @@ import org.springframework.data.r2dbc.repository.support.R2dbcRepositoryFactory;
 import org.springframework.data.relational.core.query.*;
 import org.springframework.data.repository.core.support.RepositoryComposition.RepositoryFragments;
 import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import io.fireflysoftware.core.banking.payments.models.repositories.managed.impl.ManagedPaymentJournalOperationsImpl;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.web.server.ResponseStatusException;
@@ -145,6 +146,12 @@ class ManagedPaymentRepositoryNativeIT {
         return new ManagedPaymentJournalOperations.EffectVersion(effect.id(), effect.fence(), effect.attempts());
     }
 
+    private Mono<Long> reschedule(ManagedPaymentEffectEntity effect, long fence, int delay) {
+        return nativeRepository.databaseTime().flatMap(now -> journal.rescheduleEffect(
+                new ManagedPaymentJournalOperations.EffectVersion(effect.id(), fence, effect.attempts()),
+                "PENDING", now.toInstant().plusSeconds(delay)));
+    }
+
     private java.sql.Connection jdbc() throws Exception {
         return DriverManager.getConnection("jdbc:postgresql://127.0.0.1:" + System.getProperty("payments.native.port") + "/postgres",
                 "payments_repository_runtime", System.getenv("PAYMENTS_NATIVE_PASSWORD"));
@@ -224,18 +231,18 @@ class ManagedPaymentRepositoryNativeIT {
         scoped(tenant, "MUTATE", () -> journal.claimEffect(version(before), "owner", Instant.ofEpochMilli(now + 30000)));
         var claimed = effect(value);
         long lower = scoped(tenant, "READ", nativeRepository::now);
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.deferEffect(tenant, value.pendingEffectId(), claimed.fence(), "PENDING", 2))).isEqualTo(1L);
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, claimed.fence(), 2))).isEqualTo(1L);
         long upper = scoped(tenant, "READ", nativeRepository::now);
         var deferred = effect(value);
         assertThat(deferred.nextAttemptAt().toInstant().toEpochMilli()).isBetween(lower + 2000, upper + 2000);
         assertThat(deferred.ownerSubject()).isNull(); assertThat(deferred.leaseUntil()).isNull();
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.deferEffect(tenant, value.pendingEffectId(), 0, "PENDING", 30))).isZero();
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, 0, 30))).isZero();
         assertThat(effect(value).nextAttemptAt()).isEqualTo(deferred.nextAttemptAt());
         lower = scoped(tenant, "READ", nativeRepository::now);
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.resetEffect(tenant, value.pendingEffectId(), claimed.fence()))).isEqualTo(1L);
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, claimed.fence(), 0))).isEqualTo(1L);
         upper = scoped(tenant, "READ", nativeRepository::now);
         assertThat(effect(value).nextAttemptAt().toInstant().toEpochMilli()).isBetween(lower, upper);
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.resetEffect(tenant, value.pendingEffectId(), 0))).isZero();
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, 0, 0))).isZero();
     }
 
     @Test
@@ -249,7 +256,8 @@ class ManagedPaymentRepositoryNativeIT {
                 .stream().map(row -> row.id().paymentId())).containsExactly(c.paymentId());
         var pending = effect(a); long now = scoped(tenant, "READ", nativeRepository::now);
         scoped(tenant, "MUTATE", () -> journal.claimEffect(version(pending), "owner", Instant.ofEpochMilli(now + 30000)));
-        scoped(tenant, "MUTATE", () -> nativeRepository.deferEffect(tenant, b.pendingEffectId(), 0, "PENDING", 30));
+        var pendingB = effect(b);
+        scoped(tenant, "MUTATE", () -> reschedule(pendingB, 0, 30));
         assertThat(scoped(tenant, "READ", () -> nativeRepository.recoveryQueue(tenant, null, 10).collectList())
                 .stream().map(row -> row.id().paymentId())).containsExactly(c.paymentId());
         assertThat(scoped(tenant, "READ", () -> nativeRepository.recoveryQueue(tenant + "_other", null, 10).collectList())).isEmpty();
