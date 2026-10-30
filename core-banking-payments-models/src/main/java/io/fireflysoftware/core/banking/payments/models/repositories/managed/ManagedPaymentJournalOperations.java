@@ -18,4 +18,5 @@ public interface ManagedPaymentJournalOperations {
     Mono<Long> saveOperation(OperationUpdate next, long priorVersion);
     Mono<Long> saveProjection(ManagedPaymentProjectionEntity next);
     Mono<Long> acknowledgeEffect(EffectVersion expected);
+    Mono<Long> rescheduleEffect(EffectVersion expected, String state, Instant nextAttempt);
 }

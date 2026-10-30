@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 
 import java.util.UUID;
 
-@Table("managed_payment_effect")
+@Table(value = "managed_payment_effect", schema = "public")
 public record ManagedPaymentEffectEntity(
         @Id @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY) ManagedPaymentIds.EffectId id,
         UUID paymentId,

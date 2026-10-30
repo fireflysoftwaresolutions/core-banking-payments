@@ -216,8 +216,9 @@ public final class ManagedPaymentStore {
 
     Mono<Void> deferEffect(String tenant, EffectRow effect) {
         int delay = Math.min(30, 1 << Math.min(5, Math.max(0, effect.attempts() - 1)));
-        return requireOne(nativeRepository.deferEffect(tenant, effect.id(), effect.fence(),
-                effect.attempts() >= 10 ? "EXHAUSTED" : "PENDING", delay), "PAYMENT_EFFECT_FENCE_CONFLICT");
+        return requireOne(Mono.defer(() -> nativeRepository.databaseTime().flatMap(now ->
+                journal.rescheduleEffect(expected(tenant, effect), effect.attempts() >= 10 ? "EXHAUSTED" : "PENDING",
+                        now.toInstant().plusSeconds(delay)))), "PAYMENT_EFFECT_FENCE_CONFLICT");
     }
 
     Flux<View> queue(String tenant, UUID after, int limit) {
@@ -240,6 +241,8 @@ public final class ManagedPaymentStore {
     }
 
     Mono<Void> resetEffect(String tenant, EffectRow effect) {
-        return requireOne(nativeRepository.resetEffect(tenant, effect.id(), effect.fence()), "PAYMENT_EFFECT_FENCE_CONFLICT");
+        return requireOne(Mono.defer(() -> nativeRepository.databaseTime().flatMap(now ->
+                journal.rescheduleEffect(expected(tenant, effect), "PENDING", now.toInstant()))),
+                "PAYMENT_EFFECT_FENCE_CONFLICT");
     }
 }

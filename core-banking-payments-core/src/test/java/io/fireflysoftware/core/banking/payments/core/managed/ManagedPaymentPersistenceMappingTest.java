@@ -9,6 +9,8 @@ import org.springframework.data.r2dbc.core.DefaultReactiveDataAccessStrategy;
 import org.springframework.data.r2dbc.dialect.PostgresDialect;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.function.BiFunction;
 
 class ManagedPaymentPersistenceMappingTest {
     private final DefaultReactiveDataAccessStrategy strategy = new DefaultReactiveDataAccessStrategy(
@@ -76,8 +78,41 @@ class ManagedPaymentPersistenceMappingTest {
         assertThat(factory.getRepository(
                 io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentJournalRepository.class,
                 org.springframework.data.repository.core.support.RepositoryComposition.RepositoryFragments.just(
-                        new io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentJournalOperationsImpl(operations))))
+                        new io.fireflysoftware.core.banking.payments.models.repositories.managed.impl.ManagedPaymentJournalOperationsImpl(operations))))
                 .isNotNull();
         org.mockito.Mockito.verifyNoInteractions(database);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void typedDatabaseClockExecutesTheCatalogQualifiedBuiltin() {
+        var factory = org.mockito.Mockito.mock(io.r2dbc.spi.ConnectionFactory.class);
+        var connection = org.mockito.Mockito.mock(io.r2dbc.spi.Connection.class);
+        var statement = org.mockito.Mockito.mock(io.r2dbc.spi.Statement.class);
+        var result = org.mockito.Mockito.mock(io.r2dbc.spi.Result.class);
+        var row = org.mockito.Mockito.mock(io.r2dbc.spi.Row.class);
+        var metadata = org.mockito.Mockito.mock(io.r2dbc.spi.RowMetadata.class);
+        var queries = new ArrayList<String>();
+        var observed = OffsetDateTime.parse("2026-10-30T12:00:00.123456Z");
+        org.mockito.Mockito.when(factory.getMetadata()).thenReturn(() -> "PostgreSQL");
+        org.mockito.Mockito.doReturn(reactor.core.publisher.Mono.just(connection)).when(factory).create();
+        org.mockito.Mockito.when(connection.close()).thenReturn(reactor.core.publisher.Mono.empty());
+        org.mockito.Mockito.when(connection.createStatement(org.mockito.ArgumentMatchers.anyString())).thenAnswer(call -> {
+            queries.add(call.getArgument(0));return statement;
+        });
+        org.mockito.Mockito.doReturn(reactor.core.publisher.Flux.just(result)).when(statement).execute();
+        org.mockito.Mockito.when(row.get(0, OffsetDateTime.class)).thenReturn(observed);
+        org.mockito.Mockito.when(result.map(org.mockito.ArgumentMatchers.any(BiFunction.class))).thenAnswer(call -> {
+            BiFunction<io.r2dbc.spi.Row, io.r2dbc.spi.RowMetadata, Object> mapper = call.getArgument(0);
+            return reactor.core.publisher.Flux.just(mapper.apply(row, metadata));
+        });
+        var operations = new org.springframework.data.r2dbc.core.R2dbcEntityTemplate(
+                org.springframework.r2dbc.core.DatabaseClient.create(factory), strategy);
+        var repositories = new org.springframework.data.r2dbc.repository.support.R2dbcRepositoryFactory(operations);
+        var clock = repositories.getRepository(
+                io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentNativeRepository.class);
+        assertThat(clock.databaseTime().block()).isEqualTo(observed);
+        assertThat(queries).containsExactly("SELECT pg_catalog.clock_timestamp()");
+        org.mockito.Mockito.verify(connection).close();
     }
 }
