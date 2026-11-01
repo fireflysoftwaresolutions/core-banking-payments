@@ -97,7 +97,7 @@ public class ManagedPaymentsController {
             @RequestBody Create input) {
         return service.create(tenant, input)
                 .map(a -> ResponseEntity.status(a.replayed() ? 200 : 201).body(a.payment()))
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @GetMapping("/{paymentId}")
@@ -111,7 +111,7 @@ public class ManagedPaymentsController {
             @PathVariable String tenant,
             @PathVariable UUID paymentId) {
         return service.read(tenant, paymentId)
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @GetMapping("/{paymentId}/history")
@@ -131,7 +131,7 @@ public class ManagedPaymentsController {
             @RequestParam(defaultValue = "-1") long afterVersion,
             @RequestParam(defaultValue = "25") int limit) {
         return service.history(tenant, paymentId, afterVersion, limit)
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @org.fireflyframework.web.idempotency.annotation.DisableIdempotency
@@ -148,7 +148,7 @@ public class ManagedPaymentsController {
             @RequestBody Claim input) {
         return coordinator
                 .claim(tenant, paymentId, input)
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @org.fireflyframework.web.idempotency.annotation.DisableIdempotency
@@ -165,7 +165,7 @@ public class ManagedPaymentsController {
             @RequestBody Failure input) {
         return coordinator
                 .recordFailure(tenant, paymentId, input)
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @GetMapping("/recovery")
@@ -181,7 +181,7 @@ public class ManagedPaymentsController {
             @RequestParam(defaultValue = "25") int limit) {
         return coordinator
                 .recoveryQueue(tenant, afterId, limit)
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @org.fireflyframework.web.idempotency.annotation.DisableIdempotency
@@ -209,7 +209,7 @@ public class ManagedPaymentsController {
                                 ResponseEntity.status(
                                                 v.state() == State.RECOVERY_REQUIRED ? 202 : 200)
                                         .body(v))
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @org.fireflyframework.web.idempotency.annotation.DisableIdempotency
@@ -233,7 +233,7 @@ public class ManagedPaymentsController {
         return coordinator
                 .decide(tenant, paymentId, input)
                 .map(v -> ResponseEntity.status(v.pendingEffectId() == null ? 200 : 202).body(v))
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
     @org.fireflyframework.web.idempotency.annotation.DisableIdempotency
@@ -257,11 +257,11 @@ public class ManagedPaymentsController {
         return coordinator
                 .recover(tenant, paymentId, input)
                 .map(v -> ResponseEntity.status(v.pendingEffectId() == null ? 200 : 202).body(v))
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(jwt)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(jwt)));
     }
 
-    static ManagedPaymentPolicy.Call call(Jwt jwt) {
-        if (jwt == null) throw ManagedPaymentPolicy.fail(401, "TRUSTED_PAYMENT_CONTEXT_REQUIRED");
+    static ManagedPaymentPolicyImpl.Call call(Jwt jwt) {
+        if (jwt == null) throw ManagedPaymentPolicyImpl.fail(401, "TRUSTED_PAYMENT_CONTEXT_REQUIRED");
         String scopes = jwt.getClaimAsString("scope");
         var principal =
                 SecurityPrincipal.builder()
@@ -274,7 +274,7 @@ public class ManagedPaymentsController {
                                         : new HashSet<>(Arrays.asList(scopes.split(" "))))
                         .claims(jwt.getClaims())
                         .build();
-        return new ManagedPaymentPolicy.Call(
+        return new ManagedPaymentPolicyImpl.Call(
                 principal, jwt.getTokenValue(), Set.copyOf(jwt.getAudience()));
     }
 }

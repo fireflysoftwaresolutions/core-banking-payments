@@ -30,6 +30,7 @@ public final class ManagedPaymentContracts {
         COMMITTING,
         CANCELLING,
         COMPLETED,
+        REVERSING,
         REVERSED,
         CANCELLED,
         EXPIRED,
@@ -45,11 +46,11 @@ public final class ManagedPaymentContracts {
             UUID destinationAccountId,
             BigDecimal amount,
             String currency,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactInteger.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactInteger3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactIntegerImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactInteger3Impl.class)
                     int ttlSeconds,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long customerNotAfterEpochMillis) {
         @com.fasterxml.jackson.annotation.JsonAnySetter
         public void rejectUnsupportedField(String name, Object ignored) {
@@ -88,7 +89,8 @@ public final class ManagedPaymentContracts {
         RESERVE,
         COMMIT,
         RELEASE,
-        OBSERVE
+        OBSERVE,
+        REVERSE
     }
 
     @io.swagger.v3.oas.annotations.media.Schema(
@@ -96,8 +98,8 @@ public final class ManagedPaymentContracts {
                     io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE)
     public record Claim(
             UUID actionId,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long expectedVersion) {
         @com.fasterxml.jackson.annotation.JsonAnySetter
         public void rejectUnsupportedField(String name, Object ignored) {
@@ -128,11 +130,11 @@ public final class ManagedPaymentContracts {
                     io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE)
     public record Failure(
             UUID effectId,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long fence,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long expectedVersion,
             FailureCode code) {
         @com.fasterxml.jackson.annotation.JsonAnySetter
@@ -148,11 +150,11 @@ public final class ManagedPaymentContracts {
                     io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE)
     public record Acknowledge(
             UUID effectId,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long fence,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long expectedVersion) {
         @com.fasterxml.jackson.annotation.JsonAnySetter
         public void rejectUnsupportedField(String name, Object ignored) {
@@ -162,7 +164,8 @@ public final class ManagedPaymentContracts {
 
     public enum DecisionKind {
         CONFIRM,
-        CANCEL
+        CANCEL,
+        REVERSE
     }
 
     @io.swagger.v3.oas.annotations.media.Schema(
@@ -171,8 +174,8 @@ public final class ManagedPaymentContracts {
     public record Decision(
             UUID actionId,
             DecisionKind kind,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long expectedVersion) {
         @com.fasterxml.jackson.annotation.JsonAnySetter
         public void rejectUnsupportedField(String name, Object ignored) {
@@ -185,8 +188,8 @@ public final class ManagedPaymentContracts {
                     io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE)
     public record Recovery(
             UUID actionId,
-            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLong.class)
-                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3.class)
+            @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ExactLongImpl.class)
+                    @tools.jackson.databind.annotation.JsonDeserialize(using = ExactLong3Impl.class)
                     Long expectedVersion) {
         @com.fasterxml.jackson.annotation.JsonAnySetter
         public void rejectUnsupportedField(String name, Object ignored) {
@@ -205,7 +208,7 @@ public final class ManagedPaymentContracts {
             UUID postingId,
             UUID reversalId) {}
 
-    public static final class ExactLong
+    public static final class ExactLongImpl
             extends com.fasterxml.jackson.databind.JsonDeserializer<Long> {
         public Long deserialize(
                 com.fasterxml.jackson.core.JsonParser p,
@@ -217,7 +220,7 @@ public final class ManagedPaymentContracts {
         }
     }
 
-    public static final class ExactLong3 extends tools.jackson.databind.ValueDeserializer<Long> {
+    public static final class ExactLong3Impl extends tools.jackson.databind.ValueDeserializer<Long> {
         public Long deserialize(
                 tools.jackson.core.JsonParser p, tools.jackson.databind.DeserializationContext c) {
             if (p.currentToken() != tools.jackson.core.JsonToken.VALUE_NUMBER_INT)
@@ -226,7 +229,7 @@ public final class ManagedPaymentContracts {
         }
     }
 
-    public static final class ExactInteger
+    public static final class ExactIntegerImpl
             extends com.fasterxml.jackson.databind.JsonDeserializer<Integer> {
         public Integer deserialize(
                 com.fasterxml.jackson.core.JsonParser p,
@@ -238,7 +241,7 @@ public final class ManagedPaymentContracts {
         }
     }
 
-    public static final class ExactInteger3
+    public static final class ExactInteger3Impl
             extends tools.jackson.databind.ValueDeserializer<Integer> {
         public Integer deserialize(
                 tools.jackson.core.JsonParser p, tools.jackson.databind.DeserializationContext c) {

@@ -70,9 +70,9 @@ class ManagedPaymentServiceArchitectureTest {
         }
         mockBean(context, LedgerFundsObservationPort.class);
         mockBean(context, io.fireflysoftware.core.banking.payments.core.instructions.PaymentTccPort.class);
-        for (String name : List.of("managed.impl.ManagedPaymentTransactions", "managed.impl.ManagedPaymentStore",
-                "managed.impl.ManagedPaymentDatabaseContext", "services.closure.impl.PaymentAccountQuiescenceStore",
-                "services.closure.impl.PaymentAccountQuiescenceDatabaseContext", "services.closure.impl.PaymentAccountQuiescenceAuthority",
+        for (String name : List.of("managed.impl.ManagedPaymentTransactionsImpl", "managed.impl.ManagedPaymentStoreImpl",
+                "managed.impl.ManagedPaymentDatabaseContextImpl", "services.closure.impl.PaymentAccountQuiescenceStoreImpl",
+                "services.closure.impl.PaymentAccountQuiescenceDatabaseContextImpl", "services.closure.impl.PaymentAccountQuiescenceAuthorityImpl",
                 "services.PaymentOrderChildFilter")) {
             context.register(Class.forName("io.fireflysoftware.core.banking.payments.core." + name));
         }
@@ -108,7 +108,7 @@ class ManagedPaymentServiceArchitectureTest {
 
     @Test
     void sharedManagedTransactionHelperRetainsPackagePrivateBoundaries() throws Exception {
-        Class<?> type = Class.forName("io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentTransactions");
+        Class<?> type = Class.forName("io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentTransactionsImpl");
         assertThat(java.lang.reflect.Modifier.isPublic(type.getModifiers())).isFalse();
         assertThat(java.util.Arrays.stream(type.getDeclaredConstructors()))
                 .noneMatch(c -> java.lang.reflect.Modifier.isPublic(c.getModifiers()));

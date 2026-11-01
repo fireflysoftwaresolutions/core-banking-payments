@@ -1,6 +1,6 @@
 package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.*;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.*;
 import io.fireflysoftware.core.banking.payments.core.managed.LedgerFundsObservationPort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -9,14 +9,14 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-@Component
-final class ManagedPaymentTransactions {
-    final ManagedPaymentStore store;
-    final ManagedPaymentDatabaseContext context;
+@Component("managedPaymentTransactions")
+final class ManagedPaymentTransactionsImpl {
+    final ManagedPaymentStoreImpl store;
+    final ManagedPaymentDatabaseContextImpl context;
     final LedgerFundsObservationPort ledger;
     final TransactionalOperator tx;
 
-    ManagedPaymentTransactions(ManagedPaymentStore store, ManagedPaymentDatabaseContext context,
+    ManagedPaymentTransactionsImpl(ManagedPaymentStoreImpl store, ManagedPaymentDatabaseContextImpl context,
             LedgerFundsObservationPort ledger, ReactiveTransactionManager manager) {
         this.store = store; this.context = context; this.ledger = ledger;
         this.tx = TransactionalOperator.create(manager);
@@ -29,7 +29,7 @@ final class ManagedPaymentTransactions {
                                 context.establish(call, tenant, purpose, accounts)
                                         .then(Mono.defer(work)))
                 .as(tx::transactional)
-                .onErrorMap(ManagedPaymentTransactions::nativeFenceFailure);
+                .onErrorMap(ManagedPaymentTransactionsImpl::nativeFenceFailure);
     }
 
     <T> Mono<T> transaction(
@@ -44,7 +44,7 @@ final class ManagedPaymentTransactions {
                                 context.establish(call, tenant, purpose, scope, accounts)
                                         .then(Mono.defer(work)))
                 .as(tx::transactional)
-                .onErrorMap(ManagedPaymentTransactions::nativeFenceFailure);
+                .onErrorMap(ManagedPaymentTransactionsImpl::nativeFenceFailure);
     }
 
     private static Throwable nativeFenceFailure(Throwable error) {

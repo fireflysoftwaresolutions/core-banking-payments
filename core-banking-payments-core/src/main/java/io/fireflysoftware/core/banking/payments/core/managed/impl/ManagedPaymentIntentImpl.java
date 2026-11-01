@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.fail;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.fail;
 
 import io.fireflysoftware.core.banking.payments.core.managed.LedgerFundsObservationPort.EnrolledPair;
 import io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.Create;
@@ -26,8 +26,8 @@ import io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedP
 import java.math.*;
 import java.util.*;
 
-public final class ManagedPaymentIntent {
-    private ManagedPaymentIntent() {}
+public final class ManagedPaymentIntentImpl {
+    private ManagedPaymentIntentImpl() {}
 
     public record CanonicalIntent(
             Create normalizedRequest,

@@ -1,6 +1,7 @@
-package io.fireflysoftware.core.banking.payments.models.repositories.managed;
+package io.fireflysoftware.core.banking.payments.models.repositories.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.models.entities.managed.*;
+import io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentJournalOperations;
 import org.springframework.data.r2dbc.core.R2dbcEntityOperations;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
@@ -16,6 +17,7 @@ public class ManagedPaymentJournalOperationsImpl implements ManagedPaymentJourna
     public Mono<ManagedPaymentOperationEntity> insertOperation(ManagedPaymentOperationEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentActionEntity> insertAction(ManagedPaymentActionEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentEffectEntity> insertEffect(ManagedPaymentEffectEntity row) { return operations.insert(row); }
+    public Mono<ManagedPaymentMonetaryProofEntity> insertMonetaryProof(ManagedPaymentMonetaryProofEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentProjectionEntity> insertProjection(ManagedPaymentProjectionEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentHistoryEntity> insertHistory(ManagedPaymentHistoryEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentOutboxEntity> insertOutbox(ManagedPaymentOutboxEntity row) { return operations.insert(row); }
@@ -51,5 +53,11 @@ public class ManagedPaymentJournalOperationsImpl implements ManagedPaymentJourna
         return operations.update(Query.query(effect(expected).and("state").is("CLAIMED")),
                 Update.update("state", "ACKNOWLEDGED").set("ownerSubject", null).set("leaseUntil", null),
                 ManagedPaymentEffectEntity.class);
+    }
+
+    public Mono<Long> rescheduleEffect(EffectVersion expected, String state, Instant nextAttempt) {
+        return operations.update(Query.query(effect(expected)),
+                Update.update("state", state).set("ownerSubject", null).set("leaseUntil", null)
+                        .set("nextAttemptAt", nextAttempt.atOffset(ZoneOffset.UTC)), ManagedPaymentEffectEntity.class);
     }
 }

@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.fail;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.fail;
 
 import io.fireflysoftware.core.banking.ledger.sdk.api.LedgerFundsApi;
 import io.fireflysoftware.core.banking.ledger.sdk.invoker.ApiClient;
@@ -32,13 +32,13 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.*;
 
-@Component
-public class SdkLedgerFundsObservationAdapter implements LedgerFundsObservationPort {
+@Component("sdkLedgerFundsObservationAdapter")
+public class SdkLedgerFundsObservationAdapterImpl implements LedgerFundsObservationPort {
     private final PaymentDelegationPort delegation;
     private final String base, audience;
     private final boolean loopback;
 
-    public SdkLedgerFundsObservationAdapter(
+    public SdkLedgerFundsObservationAdapterImpl(
             PaymentDelegationPort delegation,
             @Value("${managed-payments.peers.ledger.base-url:}") String base,
             @Value("${managed-payments.peers.ledger.audience:}") String audience,
@@ -331,6 +331,203 @@ public class SdkLedgerFundsObservationAdapter implements LedgerFundsObservationP
                                             .ManagedPaymentContracts.FailureCode
                                             .OBSERVATION_UNAVAILABLE);
                         });
+    }
+
+    @Override
+    public Mono<VerifiedMonetaryObservation> observeMonetary(
+            String tenant,
+            io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.View intent,
+            MonetaryExpectation expected) {
+        return Mono.defer(() ->
+                org.springframework.transaction.reactive.TransactionSynchronizationManager.forCurrentTransaction()
+                        .map(manager -> manager.isActualTransactionActive())
+                        .onErrorReturn(org.springframework.transaction.NoTransactionException.class, false)
+                        .flatMap(active -> active
+                                ? Mono.error(fail(503, "LEDGER_PROOF_READ_OUTSIDE_PAYMENT_TRANSACTION_REQUIRED"))
+                                : observe(tenant, intent).flatMap(observed -> {
+                                    if (observed.reservationId() == null) return Mono.error(inconsistent());
+                                    return client(tenant, intent.sourceAccountId(), intent.destinationAccountId(),
+                                                    Set.of("funds:read"))
+                                            .flatMap(api -> api.getFundsMonetaryReceipts(
+                                                    tenant, observed.reservationId(), null))
+                                            .switchIfEmpty(Mono.error(unavailable()))
+                                            .map(evidence -> verifyMonetary(intent, observed, evidence, expected));
+                                })))
+                .timeout(Duration.ofSeconds(10))
+                .onErrorMap(error -> {
+                    if (error instanceof ObservationUnavailable
+                            || error instanceof org.springframework.web.server.ResponseStatusException) return error;
+                    if (error instanceof IllegalArgumentException || error instanceof NullPointerException)
+                        return inconsistent();
+                    if (error instanceof org.springframework.web.reactive.function.client.WebClientResponseException peer)
+                        return new ObservationUnavailable(peer.getStatusCode().is4xxClientError()
+                                ? io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.FailureCode.PEER_REJECTED
+                                : io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.FailureCode.OBSERVATION_UNAVAILABLE);
+                    return unavailable();
+                });
+    }
+
+    private VerifiedMonetaryObservation verifyMonetary(
+            io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.View intent,
+            VerifiedFundsObservation observed,
+            io.fireflysoftware.core.banking.ledger.sdk.model.EvidenceView evidence,
+            MonetaryExpectation expected) {
+        if (expected == null || expected.kind() == null || expected.selectedActionId() == null
+                || evidence == null || evidence.getEvidenceStatus() == null) throw inconsistent();
+        if (evidence.getEvidenceStatus()
+                == io.fireflysoftware.core.banking.ledger.sdk.model.EvidenceView.EvidenceStatusEnum.HISTORICAL_UNAVAILABLE)
+            throw unavailable();
+        var current = evidence.getCurrentReservation();
+        if (current == null || current.getVersion() == null || current.getVersion() < 0
+                || current.getState() == null || current.getExpiresAt() == null
+                || observed.ledgerVersion() == null || observed.observedAt() == null
+                || observed.expiresAt() == null) throw inconsistent();
+        if (!Objects.equals(current.getVersion(), observed.ledgerVersion())
+                || !Objects.equals(current.getState().getValue(), observed.ledgerState())
+                || !Objects.equals(current.getReservationId(), observed.reservationId())
+                || !Objects.equals(current.getPostingId(), observed.postingId())
+                || !Objects.equals(current.getReversalId(), observed.reversalId())
+                || !Objects.equals(current.getOperationId(), intent.paymentId())
+                || !Objects.equals(current.getSourceAccountId(), intent.sourceAccountId())
+                || !Objects.equals(current.getDestinationAccountId(), intent.destinationAccountId())
+                || current.getAmount() == null
+                || current.getAmount().compareTo(new java.math.BigDecimal(intent.amount())) != 0
+                || !Objects.equals(current.getCurrency(), intent.currency())
+                || !Objects.equals(current.getExpiresAt().toInstant(java.time.ZoneOffset.UTC), observed.expiresAt()))
+            throw unavailable();
+        if (expected.minimumOwnerVersion() != null
+                && (expected.minimumOwnerVersion() < 0
+                    || current.getVersion() < expected.minimumOwnerVersion())) throw inconsistent();
+        var accepted = accepted(evidence.getAcceptedReserve());
+        var commit = monetary(evidence.getCommit());
+        var original = accepted.value();
+        if (!Objects.equals(original.tenant(), intent.tenant())
+                || !Objects.equals(original.reservationId(), observed.reservationId())
+                || !Objects.equals(original.intent().operationId(), intent.paymentId())
+                || !Objects.equals(original.intent().sourceAccountId(), intent.sourceAccountId())
+                || !Objects.equals(original.intent().destinationAccountId(), intent.destinationAccountId())
+                || original.intent().amount().compareTo(new java.math.BigDecimal(intent.amount())) != 0
+                || !Objects.equals(original.intent().currency(), intent.currency())
+                || original.intent().ttlSeconds() != intent.ttlSeconds()
+                || !Objects.equals(original.intent().notAfterEpochMillis(), intent.notAfterEpochMillis())
+                || original.expiresAtEpochMillis() != observed.expiresAt().toEpochMilli()
+                || original.source().currencyScale() != intent.currencyScale()
+                || original.destination().currencyScale() != intent.currencyScale()
+                || !Objects.equals(original.source().currencyPolicy(), intent.currencyPolicy())
+                || !Objects.equals(original.destination().currencyPolicy(), intent.currencyPolicy())
+                || commit.value().effectKind()
+                    != io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.EffectKind.COMMIT
+                || !Objects.equals(commit.value().postingId(), observed.postingId())
+                || !io.fireflysoftware.core.banking.ledger.interfaces.protocol.receipt.FundsReceiptCodec
+                    .canonicalAccepted(commit.value().acceptedReserve()).equals(accepted.canonical())) throw inconsistent();
+        if (expected.kind() == MonetaryKind.COMMIT) {
+            if (!Objects.equals(commit.value().actionId(), expected.selectedActionId())) throw inconsistent();
+            if (!"COMMITTED".equals(observed.ledgerState()) || evidence.getReversal() != null) throw unavailable();
+            return new VerifiedMonetaryObservation(observed, proof(commit), null);
+        }
+        if (!Objects.equals(commit.value().actionId(), expected.originalCommitActionId())
+                || !Objects.equals(commit.value().receiptId(), expected.originalCommitReceiptId())
+                || !Objects.equals(commit.canonical().digest(), expected.originalCommitDigest())
+                || !Objects.equals(commit.value().postingId(), expected.originalPostingId())) throw inconsistent();
+        if (!"REVERSED".equals(observed.ledgerState()) || evidence.getReversal() == null) throw unavailable();
+        var reversal = monetary(evidence.getReversal());
+        io.fireflysoftware.core.banking.ledger.interfaces.protocol.receipt.FundsReceiptCodec
+                .validateReversal(reversal.value(), commit.value());
+        if (!Objects.equals(reversal.value().actionId(), expected.selectedActionId())
+                || !Objects.equals(reversal.value().postingId(), observed.reversalId())) throw inconsistent();
+        return new VerifiedMonetaryObservation(observed, proof(commit), proof(reversal));
+    }
+
+    private static io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.CanonicalForm canonical(
+            io.fireflysoftware.core.banking.ledger.sdk.model.CanonicalForm value) {
+        Objects.requireNonNull(value);
+        return new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.CanonicalForm(
+                value.getEncoding(), value.getCanonical(), value.getDigest());
+    }
+
+    private static io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.AcceptedReserveEnvelope accepted(
+            io.fireflysoftware.core.banking.ledger.sdk.model.AcceptedReserveEnvelope value) {
+        Objects.requireNonNull(value);
+        var envelope = new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.AcceptedReserveEnvelope(
+                accepted(value.getValue()), canonical(value.getCanonical()));
+        io.fireflysoftware.core.banking.ledger.interfaces.protocol.receipt.FundsReceiptCodec.verify(envelope);
+        return envelope;
+    }
+
+    private static io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.AcceptedReserve accepted(
+            io.fireflysoftware.core.banking.ledger.sdk.model.AcceptedReserve value) {
+        Objects.requireNonNull(value);
+        var r = Objects.requireNonNull(value.getIntent());
+        return new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.AcceptedReserve(
+                value.getTenant(), value.getReservationId(),
+                new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsContracts.Reserve(
+                        r.getOperationId(), r.getSourceAccountId(), r.getDestinationAccountId(), r.getAmount(),
+                        r.getCurrency(), r.getTtlSeconds(), r.getNotAfterEpochMillis()),
+                value.getIntentRecordedAtEpochMillis(), value.getExpiresAtEpochMillis(),
+                snapshot(value.getSource()), snapshot(value.getDestination()));
+    }
+
+    private static io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.EnrollmentSnapshot snapshot(
+            io.fireflysoftware.core.banking.ledger.sdk.model.EnrollmentSnapshot value) {
+        Objects.requireNonNull(value);
+        var kind = switch (Objects.requireNonNull(value.getKind())) {
+            case CUSTOMER -> io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsContracts.Kind.CUSTOMER;
+            case BANK_CONTROL -> io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsContracts.Kind.BANK_CONTROL;
+        };
+        return new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.EnrollmentSnapshot(
+                value.getAccountId(), value.getEnrollmentId(), value.getContractId(), value.getCurrency(),
+                value.getCurrencyScale(), value.getCurrencyPolicy(), kind);
+    }
+
+    private static io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.BalanceVector balances(
+            io.fireflysoftware.core.banking.ledger.sdk.model.BalanceVector value) {
+        Objects.requireNonNull(value);
+        return new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.BalanceVector(
+                value.getBookedBefore(), value.getHeldBefore(), value.getBookedAfter(), value.getHeldAfter());
+    }
+
+    private static io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.MonetaryReceiptEnvelope monetary(
+            io.fireflysoftware.core.banking.ledger.sdk.model.MonetaryReceiptEnvelope value) {
+        Objects.requireNonNull(value);
+        var r = Objects.requireNonNull(value.getValue());
+        var e = Objects.requireNonNull(r.getEffect());
+        var actor = Objects.requireNonNull(r.getActor());
+        var kind = switch (Objects.requireNonNull(r.getEffectKind())) {
+            case COMMIT -> io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.EffectKind.COMMIT;
+            case REVERSE -> io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.EffectKind.REVERSE;
+        };
+        var effect = new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.MoneyEffect(
+                e.getAmount(), e.getCurrency(), snapshot(e.getSource()), snapshot(e.getDestination()),
+                e.getSourceMinorUnits(), e.getDestinationMinorUnits(), e.getFromAccountId(), e.getToAccountId(),
+                balances(e.getSourceBalances()), balances(e.getDestinationBalances()));
+        var receipt = new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.MonetaryReceipt(
+                r.getReceiptId(), r.getEventId(), r.getTenant(), r.getReservationId(), r.getOperationId(), kind,
+                r.getActionId(), accepted(r.getAcceptedReserve()), r.getPostingId(), r.getOriginalCommitReceiptId(),
+                r.getOriginalPostingId(), r.getEffectRecordedAtEpochMillis(), effect,
+                new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.Actor(
+                        actor.getIssuer(), actor.getSubject()));
+        var envelope = new io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.MonetaryReceiptEnvelope(
+                receipt, canonical(value.getCanonical()));
+        io.fireflysoftware.core.banking.ledger.interfaces.protocol.receipt.FundsReceiptCodec.verify(envelope);
+        return envelope;
+    }
+
+    private static VerifiedMonetaryProof proof(
+            io.fireflysoftware.core.banking.ledger.interfaces.dtos.funds.FundsReceiptContracts.MonetaryReceiptEnvelope envelope) {
+        var r = envelope.value();
+        String json;
+        try { json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(envelope); }
+        catch (com.fasterxml.jackson.core.JsonProcessingException error) { throw inconsistent(); }
+        return new VerifiedMonetaryProof(
+                switch (r.effectKind()) { case COMMIT -> MonetaryKind.COMMIT; case REVERSE -> MonetaryKind.REVERSE; },
+                r.receiptId(), r.actionId(), r.reservationId(), r.postingId(), r.originalCommitReceiptId(),
+                r.originalPostingId(), envelope.canonical().encoding(), envelope.canonical().canonical(),
+                envelope.canonical().digest(), json);
+    }
+
+    private static ObservationUnavailable unavailable() {
+        return new ObservationUnavailable(
+                io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.FailureCode.OBSERVATION_UNAVAILABLE);
     }
 
     static ObservationUnavailable inconsistent() {

@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.*;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.*;
 
 import io.fireflysoftware.core.banking.payments.core.managed.LedgerFundsObservationPort.EnrolledPair;
 import io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.*;
@@ -34,13 +34,13 @@ import java.util.function.Supplier;
 
 @Service("managedPaymentService")
 public class ManagedPaymentServiceImpl implements ManagedPaymentService {
-    private final ManagedPaymentTransactions transactions;
-    final ManagedPaymentStore store;
+    private final ManagedPaymentTransactionsImpl transactions;
+    final ManagedPaymentStoreImpl store;
     final LedgerFundsObservationPort ledger;
-    final ManagedPaymentDatabaseContext context;
+    final ManagedPaymentDatabaseContextImpl context;
     final TransactionalOperator tx;
 
-    public ManagedPaymentServiceImpl(ManagedPaymentTransactions transactions) {
+    public ManagedPaymentServiceImpl(ManagedPaymentTransactionsImpl transactions) {
         this.transactions = transactions; this.store = transactions.store; this.ledger = transactions.ledger;
         this.context = transactions.context; this.tx = transactions.tx;
     }
@@ -49,7 +49,7 @@ public class ManagedPaymentServiceImpl implements ManagedPaymentService {
         return current()
                 .flatMap(
                         call -> {
-                            ManagedPaymentIntent.basic(input);
+                            ManagedPaymentIntentImpl.basic(input);
                             require(
                                     call,
                                     tenant,
@@ -80,7 +80,7 @@ public class ManagedPaymentServiceImpl implements ManagedPaymentService {
                                                                     .flatMap(
                                                                             enrolled -> {
                                                                                 var intent =
-                                                                                        ManagedPaymentIntent
+                                                                                        ManagedPaymentIntentImpl
                                                                                                 .canonical(
                                                                                                         input,
                                                                                                         enrolled);
@@ -203,7 +203,7 @@ public class ManagedPaymentServiceImpl implements ManagedPaymentService {
     Accepted replay(View v, Create input) {
         try {
             var candidate =
-                    ManagedPaymentIntent.canonical(
+                    ManagedPaymentIntentImpl.canonical(
                             input,
                             new EnrolledPair(
                                     v.sourceAccountId(),
@@ -221,7 +221,7 @@ public class ManagedPaymentServiceImpl implements ManagedPaymentService {
                             v.ttlSeconds(),
                             v.customerNotAfterEpochMillis());
             var digest =
-                    ManagedPaymentIntent.canonical(
+                    ManagedPaymentIntentImpl.canonical(
                                     retained,
                                     new EnrolledPair(
                                             v.sourceAccountId(),

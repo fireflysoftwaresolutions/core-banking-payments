@@ -8,5 +8,6 @@ public final class ManagedPaymentIds {
     public record OperationId(@Column("tenant_id") String tenantId, @Column("payment_id") UUID paymentId) {}
     public record ActionId(@Column("tenant_id") String tenantId, @Column("action_id") UUID actionId) {}
     public record EffectId(@Column("tenant_id") String tenantId, @Column("effect_id") UUID effectId) {}
+    public record ProofId(@Column("tenant_id") String tenantId, @Column("effect_id") UUID effectId) {}
     public record EventId(@Column("tenant_id") String tenantId, @Column("payment_id") UUID paymentId, @Column("version") long version) {}
 }

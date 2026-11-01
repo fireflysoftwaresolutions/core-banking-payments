@@ -18,6 +18,7 @@
 
     <dependencies>
 <dependency><groupId>io.fireflysoftware</groupId><artifactId>core-banking-ledger-sdk</artifactId><version>26.10.6</version></dependency>
+<dependency><groupId>io.fireflysoftware</groupId><artifactId>core-banking-ledger-interfaces</artifactId><version>26.10.6</version></dependency>
 <dependency><groupId>org.fireflyframework</groupId><artifactId>fireflyframework-security-api</artifactId></dependency>
 <dependency><groupId>org.fireflyframework</groupId><artifactId>fireflyframework-security-spi</artifactId></dependency>
 

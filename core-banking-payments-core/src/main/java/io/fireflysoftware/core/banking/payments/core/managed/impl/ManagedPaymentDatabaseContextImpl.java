@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.*;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.*;
 
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.data.r2dbc.core.R2dbcEntityOperations;
@@ -31,12 +31,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-@Component
-public final class ManagedPaymentDatabaseContext {
+@Component("managedPaymentDatabaseContext")
+public final class ManagedPaymentDatabaseContextImpl {
     private final ConnectionFactory factory;
     private final ManagedPaymentNativeRepository nativeRepository;
 
-    public ManagedPaymentDatabaseContext(R2dbcEntityOperations operations, ManagedPaymentNativeRepository nativeRepository) {
+    public ManagedPaymentDatabaseContextImpl(R2dbcEntityOperations operations, ManagedPaymentNativeRepository nativeRepository) {
         this.factory = operations.getDatabaseClient().getConnectionFactory();
         this.nativeRepository = nativeRepository;
     }

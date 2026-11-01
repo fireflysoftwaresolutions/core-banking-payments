@@ -11,10 +11,10 @@ class ManagedPaymentPersistenceArchitectureTest {
     @Test
     void ownerStoresAndContextUseSpringDataBoundariesWithoutRawSql() throws Exception {
         Path root = Path.of("src/main/java/io/fireflysoftware/core/banking/payments/core");
-        for (String path : List.of("managed/impl/ManagedPaymentStore.java",
-                "managed/impl/ManagedPaymentDatabaseContext.java",
-                "services/closure/impl/PaymentAccountQuiescenceStore.java",
-                "services/closure/impl/PaymentAccountQuiescenceDatabaseContext.java")) {
+        for (String path : List.of("managed/impl/ManagedPaymentStoreImpl.java",
+                "managed/impl/ManagedPaymentDatabaseContextImpl.java",
+                "services/closure/impl/PaymentAccountQuiescenceStoreImpl.java",
+                "services/closure/impl/PaymentAccountQuiescenceDatabaseContextImpl.java")) {
             assertThat(Files.readString(root.resolve(path))).as(path)
                     .doesNotContain("org.springframework.r2dbc.core.DatabaseClient", ".sql(");
         }

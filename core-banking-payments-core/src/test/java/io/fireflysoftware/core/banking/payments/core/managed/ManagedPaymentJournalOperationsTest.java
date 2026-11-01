@@ -24,7 +24,7 @@ class ManagedPaymentJournalOperationsTest {
 
     private ManagedPaymentJournalOperations journal() throws Exception {
         Class<?> type = null;
-        try { type = Class.forName("io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentJournalOperationsImpl"); }
+        try { type = Class.forName("io.fireflysoftware.core.banking.payments.models.repositories.managed.impl.ManagedPaymentJournalOperationsImpl"); }
         catch (ClassNotFoundException missing) { }
         assertThat(type).as("Mapped journal fragment implementation").isNotNull();
         return (ManagedPaymentJournalOperations) type.getConstructor(R2dbcEntityOperations.class).newInstance(operations);
@@ -95,5 +95,42 @@ class ManagedPaymentJournalOperationsTest {
         when(operations.insert(history)).thenReturn(Mono.just(history));
         assertThat(journal.insertHistory(history).block()).isSameAs(history);
         verify(operations).insert(history);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Mono<Long> reschedule(ManagedPaymentJournalOperations journal,
+            ManagedPaymentJournalOperations.EffectVersion expected, String state, Instant nextAttempt) throws Exception {
+        var method = Arrays.stream(ManagedPaymentJournalOperations.class.getMethods())
+                .filter(candidate -> candidate.getName().equals("rescheduleEffect")).findFirst().orElse(null);
+        assertThat(method).as("Mapped effect rescheduling fragment").isNotNull();
+        return (Mono<Long>) method.invoke(journal, expected, state, nextAttempt);
+    }
+
+    @Test
+    void rescheduleBindsExactTenantEffectFenceAndClearsLeaseWithoutLosingMicroseconds() throws Exception {
+        var journal = journal();capture(0);var expected = effect(19L, 2);
+        var nextAttempt = Instant.parse("2026-10-30T12:00:01.123456Z");
+        assertThat(reschedule(journal, expected, "EXHAUSTED", nextAttempt).block()).isZero();
+        assertThat(sql).contains("tenant_id", "effect_id", "fence", "state", "next_attempt_at",
+                "owner_subject = NULL", "lease_until = NULL");
+        assertThat(binds).contains("bank", expected.id().effectId(), 19L, "EXHAUSTED",
+                nextAttempt.atOffset(java.time.ZoneOffset.UTC));
+        assertThat(sql).doesNotContain("attempts =", "fence = fence");
+    }
+
+    @Test
+    void rescheduleReturnsTheActualAffectedRowCount() throws Exception {
+        var journal = journal();var expected = effect(8L, 4);
+        for (long affected : new long[] {0, 1, 2}) {
+            capture(affected);
+            assertThat(reschedule(journal, expected, "PENDING", Instant.EPOCH).block()).isEqualTo(affected);
+        }
+    }
+
+    @Test
+    void mappedEffectReschedulingTargetsTheCanonicalPublicRelation() throws Exception {
+        var journal = journal();capture(1);
+        assertThat(reschedule(journal, effect(7L, 3), "PENDING", Instant.EPOCH).block()).isEqualTo(1L);
+        assertThat(sql).startsWith("UPDATE public.managed_payment_effect SET ");
     }
 }

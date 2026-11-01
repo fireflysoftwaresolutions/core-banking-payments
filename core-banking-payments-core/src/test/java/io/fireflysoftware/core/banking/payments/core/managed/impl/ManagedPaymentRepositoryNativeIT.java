@@ -18,6 +18,7 @@ import org.springframework.data.r2dbc.repository.support.R2dbcRepositoryFactory;
 import org.springframework.data.relational.core.query.*;
 import org.springframework.data.repository.core.support.RepositoryComposition.RepositoryFragments;
 import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import io.fireflysoftware.core.banking.payments.models.repositories.managed.impl.ManagedPaymentJournalOperationsImpl;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.web.server.ResponseStatusException;
@@ -46,8 +47,8 @@ class ManagedPaymentRepositoryNativeIT {
     private static ManagedPaymentEffectRepository effects;
     private static ManagedPaymentHistoryRepository histories;
     private static ManagedPaymentJournalRepository journal;
-    private static ManagedPaymentDatabaseContext context;
-    private static ManagedPaymentStore store;
+    private static ManagedPaymentDatabaseContextImpl context;
+    private static ManagedPaymentStoreImpl store;
     private static TransactionalOperator tx;
     private String tenant;
     private UUID source;
@@ -91,8 +92,8 @@ class ManagedPaymentRepositoryNativeIT {
         histories = factory.getRepository(ManagedPaymentHistoryRepository.class);
         journal = factory.getRepository(ManagedPaymentJournalRepository.class,
                 RepositoryFragments.just(new ManagedPaymentJournalOperationsImpl(template)));
-        context = new ManagedPaymentDatabaseContext(template, nativeRepository);
-        store = new ManagedPaymentStore(operations, actions, effects, histories, journal, nativeRepository);
+        context = new ManagedPaymentDatabaseContextImpl(template, nativeRepository);
+        store = new ManagedPaymentStoreImpl(operations, actions, effects, histories, factory.getRepository(ManagedPaymentMonetaryProofRepository.class), journal, nativeRepository);
         tx = TransactionalOperator.create(new R2dbcTransactionManager(pool));
     }
 
@@ -105,12 +106,12 @@ class ManagedPaymentRepositoryNativeIT {
         source = UUID.randomUUID(); destination = UUID.randomUUID(); TRACE.clear();
     }
 
-    private ManagedPaymentPolicy.Call caller(String tenant, UUID... grants) {
+    private ManagedPaymentPolicyImpl.Call caller(String tenant, UUID... grants) {
         var principal = SecurityPrincipal.builder().subject("owned-native-persistence").issuer("https://owned.invalid")
                 .tenantId(tenant).scopes(Set.of("payments:create", "payments:read"))
                 .claims(Map.of("exp", Instant.now().plusSeconds(120), "funds_accounts",
                         Arrays.stream(grants).map(UUID::toString).toList())).build();
-        return new ManagedPaymentPolicy.Call(principal, "unused-owned-fixture-credential", Set.of());
+        return new ManagedPaymentPolicyImpl.Call(principal, "unused-owned-fixture-credential", Set.of());
     }
 
     private <T> Mono<T> scope(String selected, String purpose, Supplier<Mono<T>> work, UUID... grants) {
@@ -143,6 +144,12 @@ class ManagedPaymentRepositoryNativeIT {
 
     private ManagedPaymentJournalOperations.EffectVersion version(ManagedPaymentEffectEntity effect) {
         return new ManagedPaymentJournalOperations.EffectVersion(effect.id(), effect.fence(), effect.attempts());
+    }
+
+    private Mono<Long> reschedule(ManagedPaymentEffectEntity effect, long fence, int delay) {
+        return nativeRepository.databaseTime().flatMap(now -> journal.rescheduleEffect(
+                new ManagedPaymentJournalOperations.EffectVersion(effect.id(), fence, effect.attempts()),
+                "PENDING", now.toInstant().plusSeconds(delay)));
     }
 
     private java.sql.Connection jdbc() throws Exception {
@@ -224,18 +231,18 @@ class ManagedPaymentRepositoryNativeIT {
         scoped(tenant, "MUTATE", () -> journal.claimEffect(version(before), "owner", Instant.ofEpochMilli(now + 30000)));
         var claimed = effect(value);
         long lower = scoped(tenant, "READ", nativeRepository::now);
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.deferEffect(tenant, value.pendingEffectId(), claimed.fence(), "PENDING", 2))).isEqualTo(1L);
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, claimed.fence(), 2))).isEqualTo(1L);
         long upper = scoped(tenant, "READ", nativeRepository::now);
         var deferred = effect(value);
         assertThat(deferred.nextAttemptAt().toInstant().toEpochMilli()).isBetween(lower + 2000, upper + 2000);
         assertThat(deferred.ownerSubject()).isNull(); assertThat(deferred.leaseUntil()).isNull();
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.deferEffect(tenant, value.pendingEffectId(), 0, "PENDING", 30))).isZero();
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, 0, 30))).isZero();
         assertThat(effect(value).nextAttemptAt()).isEqualTo(deferred.nextAttemptAt());
         lower = scoped(tenant, "READ", nativeRepository::now);
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.resetEffect(tenant, value.pendingEffectId(), claimed.fence()))).isEqualTo(1L);
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, claimed.fence(), 0))).isEqualTo(1L);
         upper = scoped(tenant, "READ", nativeRepository::now);
         assertThat(effect(value).nextAttemptAt().toInstant().toEpochMilli()).isBetween(lower, upper);
-        assertThat(scoped(tenant, "MUTATE", () -> nativeRepository.resetEffect(tenant, value.pendingEffectId(), 0))).isZero();
+        assertThat(scoped(tenant, "MUTATE", () -> reschedule(claimed, 0, 0))).isZero();
     }
 
     @Test
@@ -249,7 +256,8 @@ class ManagedPaymentRepositoryNativeIT {
                 .stream().map(row -> row.id().paymentId())).containsExactly(c.paymentId());
         var pending = effect(a); long now = scoped(tenant, "READ", nativeRepository::now);
         scoped(tenant, "MUTATE", () -> journal.claimEffect(version(pending), "owner", Instant.ofEpochMilli(now + 30000)));
-        scoped(tenant, "MUTATE", () -> nativeRepository.deferEffect(tenant, b.pendingEffectId(), 0, "PENDING", 30));
+        var pendingB = effect(b);
+        scoped(tenant, "MUTATE", () -> reschedule(pendingB, 0, 30));
         assertThat(scoped(tenant, "READ", () -> nativeRepository.recoveryQueue(tenant, null, 10).collectList())
                 .stream().map(row -> row.id().paymentId())).containsExactly(c.paymentId());
         assertThat(scoped(tenant, "READ", () -> nativeRepository.recoveryQueue(tenant + "_other", null, 10).collectList())).isEmpty();
@@ -296,7 +304,7 @@ class ManagedPaymentRepositoryNativeIT {
                 .then(store.accountGates(tenant, source, destination))
                 .then(nativeRepository.now()).flatMap(now -> store.effect(tenant, value.pendingEffectId())
                         .flatMap(pending -> store.claimEffect(tenant, pending, "owned-native-persistence", Instant.ofEpochMilli(now + 30000))))
-                .then(store.save(ManagedPaymentStore.evolve(value, State.RESERVING, value.pendingEffectId(), null),
+                .then(store.save(ManagedPaymentStoreImpl.evolve(value, State.RESERVING, value.pendingEffectId(), null),
                         "EFFECT_CLAIMED", "owned-native-persistence", value.createActionId(), value.pendingEffectId())));
         assertThat(TRACE.stream().map(Execution::connection).distinct()).hasSize(1);
         assertThat(TRACE.stream().map(Execution::operation)).contains("beginTransaction", "commitTransaction");

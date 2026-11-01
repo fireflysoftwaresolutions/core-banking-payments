@@ -15,9 +15,9 @@ import java.util.*;
 
 class ManagedPaymentStoreErrorTest {
     private final ManagedPaymentJournalRepository journal = mock(ManagedPaymentJournalRepository.class);
-    private final ManagedPaymentStore store = new ManagedPaymentStore(mock(ManagedPaymentOperationRepository.class),
+    private final ManagedPaymentStoreImpl store = new ManagedPaymentStoreImpl(mock(ManagedPaymentOperationRepository.class),
             mock(ManagedPaymentActionRepository.class), mock(ManagedPaymentEffectRepository.class),
-            mock(ManagedPaymentHistoryRepository.class), journal, mock(ManagedPaymentNativeRepository.class));
+            mock(ManagedPaymentHistoryRepository.class), mock(ManagedPaymentMonetaryProofRepository.class), journal, mock(ManagedPaymentNativeRepository.class));
 
     private static class NativeFailure extends R2dbcException implements PostgresqlException {
         private final ErrorDetails details;

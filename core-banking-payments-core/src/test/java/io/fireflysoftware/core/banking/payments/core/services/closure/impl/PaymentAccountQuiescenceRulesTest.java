@@ -50,7 +50,7 @@ class PaymentAccountQuiescenceRulesTest {
     }
 
     static Quiesce decode(String wire) {
-        return PaymentAccountQuiescenceRules.decode(wire.getBytes(StandardCharsets.UTF_8));
+        return PaymentAccountQuiescenceRulesImpl.decode(wire.getBytes(StandardCharsets.UTF_8));
     }
 
     static void bad(String wire) {
@@ -63,15 +63,15 @@ class PaymentAccountQuiescenceRulesTest {
     @Test
     void exactRequestRequiresCurrentFenceVersionAndSelectedEnrollment() {
         assertThat(decode(WIRE)).isEqualTo(request());
-        assertThatCode(() -> PaymentAccountQuiescenceRules.admit(SELECTED, request(), 0))
+        assertThatCode(() -> PaymentAccountQuiescenceRulesImpl.admit(SELECTED, request(), 0))
                 .doesNotThrowAnyException();
-        assertThatThrownBy(() -> PaymentAccountQuiescenceRules.admit(SELECTED, request(), 1))
+        assertThatThrownBy(() -> PaymentAccountQuiescenceRulesImpl.admit(SELECTED, request(), 1))
                 .isInstanceOfSatisfying(
                         ResponseStatusException.class,
                         e -> assertThat(e.getStatusCode().value()).isEqualTo(409));
         assertThatThrownBy(
                         () ->
-                                PaymentAccountQuiescenceRules.admit(
+                                PaymentAccountQuiescenceRulesImpl.admit(
                                         new Selection(
                                                 "tenant-one",
                                                 ACCOUNT,
@@ -106,7 +106,7 @@ class PaymentAccountQuiescenceRulesTest {
         bad("[]");
         assertThatThrownBy(
                         () ->
-                                PaymentAccountQuiescenceRules.decode(
+                                PaymentAccountQuiescenceRulesImpl.decode(
                                         new byte[] {(byte) 0xc3, (byte) 0x28}))
                 .isInstanceOf(ResponseStatusException.class);
         bad(WIRE.replace(ACTION.toString(), "1"));
@@ -128,22 +128,22 @@ class PaymentAccountQuiescenceRulesTest {
                         + "36:"
                         + ENROLLMENT
                         + "1:0";
-        assertThat(PaymentAccountQuiescenceCanonical.canonical(SELECTED, request()))
+        assertThat(PaymentAccountQuiescenceCanonicalImpl.canonical(SELECTED, request()))
                 .isEqualTo(expected);
         assertThat(
-                        PaymentAccountQuiescenceCanonical.digest(
+                        PaymentAccountQuiescenceCanonicalImpl.digest(
                                 SELECTED, new Quiesce(CONTRACT, CLOSURE, ENROLLMENT, 0L)))
-                .isNotEqualTo(PaymentAccountQuiescenceCanonical.digest(SELECTED, request()));
+                .isNotEqualTo(PaymentAccountQuiescenceCanonicalImpl.digest(SELECTED, request()));
         assertThat(
-                        PaymentAccountQuiescenceCanonical.digest(
+                        PaymentAccountQuiescenceCanonicalImpl.digest(
                                 SELECTED, new Quiesce(ACTION, CONTRACT, ENROLLMENT, 0L)))
-                .isNotEqualTo(PaymentAccountQuiescenceCanonical.digest(SELECTED, request()));
+                .isNotEqualTo(PaymentAccountQuiescenceCanonicalImpl.digest(SELECTED, request()));
         assertThat(
-                        PaymentAccountQuiescenceCanonical.digest(
+                        PaymentAccountQuiescenceCanonicalImpl.digest(
                                 SELECTED, new Quiesce(ACTION, CLOSURE, ENROLLMENT, 1L)))
-                .isNotEqualTo(PaymentAccountQuiescenceCanonical.digest(SELECTED, request()));
+                .isNotEqualTo(PaymentAccountQuiescenceCanonicalImpl.digest(SELECTED, request()));
         assertThat(
-                        PaymentAccountQuiescenceCanonical.digest(
+                        PaymentAccountQuiescenceCanonicalImpl.digest(
                                 new Selection(
                                         "tenant-two",
                                         ACCOUNT,
@@ -153,7 +153,7 @@ class PaymentAccountQuiescenceRulesTest {
                                         2,
                                         "funds-policy-v1"),
                                 request()))
-                .isNotEqualTo(PaymentAccountQuiescenceCanonical.digest(SELECTED, request()));
+                .isNotEqualTo(PaymentAccountQuiescenceCanonicalImpl.digest(SELECTED, request()));
     }
 
     @Test
@@ -165,11 +165,11 @@ class PaymentAccountQuiescenceRulesTest {
                         new Quiesce(ACTION, CLOSURE, null, 0L),
                         new Quiesce(ACTION, CLOSURE, ENROLLMENT, null),
                         new Quiesce(ACTION, CLOSURE, ENROLLMENT, -1L)))
-            assertThatThrownBy(() -> PaymentAccountQuiescenceRules.admit(SELECTED, next, 0))
+            assertThatThrownBy(() -> PaymentAccountQuiescenceRulesImpl.admit(SELECTED, next, 0))
                     .isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(
                         () ->
-                                PaymentAccountQuiescenceCanonical.canonical(
+                                PaymentAccountQuiescenceCanonicalImpl.canonical(
                                         new Selection(
                                                 "tenant-one",
                                                 ACCOUNT,
@@ -182,16 +182,16 @@ class PaymentAccountQuiescenceRulesTest {
                 .isInstanceOf(ResponseStatusException.class);
         bad(WIRE.replace(ACTION.toString(), "00000000-0000-0000-0000-000000000000"));
         bad(WIRE.replace(ACTION.toString(), "00000000-0000-0000-0000-00000000000A"));
-        assertThatThrownBy(() -> PaymentAccountQuiescenceRules.decode(new byte[8193]))
+        assertThatThrownBy(() -> PaymentAccountQuiescenceRulesImpl.decode(new byte[8193]))
                 .isInstanceOf(ResponseStatusException.class);
-        assertThat(PaymentAccountQuiescenceCanonical.digest(SELECTED, request()))
+        assertThat(PaymentAccountQuiescenceCanonicalImpl.digest(SELECTED, request()))
                 .isEqualTo("d637aa990f133cd14b621d2d023f7c59c5673f749038e95a14763a9465c440bc");
     }
 
     @Test
     void canonicalIdentityIncludesRealMoneyPrecisionAndPolicySelection() {
         assertThat(
-                        PaymentAccountQuiescenceCanonical.digest(
+                        PaymentAccountQuiescenceCanonicalImpl.digest(
                                 new Selection(
                                         "tenant-one",
                                         ACCOUNT,
@@ -201,9 +201,9 @@ class PaymentAccountQuiescenceRulesTest {
                                         3,
                                         "funds-policy-v1"),
                                 request()))
-                .isNotEqualTo(PaymentAccountQuiescenceCanonical.digest(SELECTED, request()));
+                .isNotEqualTo(PaymentAccountQuiescenceCanonicalImpl.digest(SELECTED, request()));
         assertThat(
-                        PaymentAccountQuiescenceCanonical.digest(
+                        PaymentAccountQuiescenceCanonicalImpl.digest(
                                 new Selection(
                                         "tenant-one",
                                         ACCOUNT,
@@ -213,10 +213,10 @@ class PaymentAccountQuiescenceRulesTest {
                                         2,
                                         "funds-policy-v2"),
                                 request()))
-                .isNotEqualTo(PaymentAccountQuiescenceCanonical.digest(SELECTED, request()));
+                .isNotEqualTo(PaymentAccountQuiescenceCanonicalImpl.digest(SELECTED, request()));
         assertThatThrownBy(
                         () ->
-                                PaymentAccountQuiescenceCanonical.canonical(
+                                PaymentAccountQuiescenceCanonicalImpl.canonical(
                                         new Selection(
                                                 "tenant-one",
                                                 ACCOUNT,
@@ -229,7 +229,7 @@ class PaymentAccountQuiescenceRulesTest {
                 .isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(
                         () ->
-                                PaymentAccountQuiescenceCanonical.canonical(
+                                PaymentAccountQuiescenceCanonicalImpl.canonical(
                                         new Selection(
                                                 "tenant-one",
                                                 ACCOUNT,
@@ -251,17 +251,17 @@ class PaymentAccountQuiescenceRulesTest {
                         + CLOSURE
                         + "\",\"expectedFenceVersion\":1}";
         var release =
-                PaymentAccountQuiescenceRules.decodeRelease(wire.getBytes(StandardCharsets.UTF_8));
+                PaymentAccountQuiescenceRulesImpl.decodeRelease(wire.getBytes(StandardCharsets.UTF_8));
         assertThat(release).isEqualTo(new Release(ACTION, CLOSURE, 1L));
         assertThatThrownBy(
                         () ->
-                                PaymentAccountQuiescenceRules.decodeRelease(
+                                PaymentAccountQuiescenceRulesImpl.decodeRelease(
                                         wire.replace(":1}", ":1.0}")
                                                 .getBytes(StandardCharsets.UTF_8)))
                 .isInstanceOf(ResponseStatusException.class);
         assertThatThrownBy(
                         () ->
-                                PaymentAccountQuiescenceRules.decodeRelease(
+                                PaymentAccountQuiescenceRulesImpl.decodeRelease(
                                         wire.replace("}", ",\"clear\":true}")
                                                 .getBytes(StandardCharsets.UTF_8)))
                 .isInstanceOf(ResponseStatusException.class);
@@ -270,24 +270,24 @@ class PaymentAccountQuiescenceRulesTest {
     @Test
     void changedReleaseIntentCannotReplaySameAction() {
         var original = new Release(ACTION, CLOSURE, 1L);
-        assertThat(PaymentAccountQuiescenceCanonical.releaseDigest(SELECTED, original))
+        assertThat(PaymentAccountQuiescenceCanonicalImpl.releaseDigest(SELECTED, original))
                 .isNotEqualTo(
-                        PaymentAccountQuiescenceCanonical.releaseDigest(
+                        PaymentAccountQuiescenceCanonicalImpl.releaseDigest(
                                 SELECTED, new Release(ACTION, CLOSURE, 2L)))
                 .isNotEqualTo(
-                        PaymentAccountQuiescenceCanonical.releaseDigest(
+                        PaymentAccountQuiescenceCanonicalImpl.releaseDigest(
                                 SELECTED, new Release(ACTION, CONTRACT, 1L)));
     }
 
     @Test
     void retainedObservationPagesCannotUseUnboundedOrNegativeSelection() {
-        assertThatCode(() -> PaymentAccountQuiescenceRules.page(0L, 100))
+        assertThatCode(() -> PaymentAccountQuiescenceRulesImpl.page(0L, 100))
                 .doesNotThrowAnyException();
-        assertThatThrownBy(() -> PaymentAccountQuiescenceRules.page(-1L, 100))
+        assertThatThrownBy(() -> PaymentAccountQuiescenceRulesImpl.page(-1L, 100))
                 .isInstanceOf(ResponseStatusException.class);
-        assertThatThrownBy(() -> PaymentAccountQuiescenceRules.page(0L, 101))
+        assertThatThrownBy(() -> PaymentAccountQuiescenceRulesImpl.page(0L, 101))
                 .isInstanceOf(ResponseStatusException.class);
-        assertThatThrownBy(() -> PaymentAccountQuiescenceRules.page(0L, 0))
+        assertThatThrownBy(() -> PaymentAccountQuiescenceRulesImpl.page(0L, 0))
                 .isInstanceOf(ResponseStatusException.class);
     }
 }

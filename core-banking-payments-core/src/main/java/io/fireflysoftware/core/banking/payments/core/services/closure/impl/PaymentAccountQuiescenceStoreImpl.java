@@ -30,8 +30,8 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.*;
 import java.util.*;
 
-@Component
-public final class PaymentAccountQuiescenceStore {
+@Component("paymentAccountQuiescenceStore")
+public final class PaymentAccountQuiescenceStoreImpl {
     private final PaymentAccountActionRepository actions;
     private final PaymentAccountFenceRepository fences;
     private final PaymentAccountObservationRepository observations;
@@ -39,7 +39,7 @@ public final class PaymentAccountQuiescenceStore {
     private final PaymentAccountNativeRepository nativeRepository;
     private final ObjectMapper json = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    public PaymentAccountQuiescenceStore(PaymentAccountActionRepository actions,
+    public PaymentAccountQuiescenceStoreImpl(PaymentAccountActionRepository actions,
             PaymentAccountFenceRepository fences, PaymentAccountObservationRepository observations,
             PaymentAccountObservationMemberRepository members, PaymentAccountNativeRepository nativeRepository) {
         this.actions = actions; this.fences = fences; this.observations = observations;

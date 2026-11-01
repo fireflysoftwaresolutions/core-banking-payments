@@ -55,13 +55,13 @@ class PaymentAccountQuiescenceAuthorityTest {
                 .build();
     }
 
-    PaymentAccountQuiescenceAuthority authority(PolicyDecisionPort policy) {
+    PaymentAccountQuiescenceAuthorityImpl authority(PolicyDecisionPort policy) {
         when(contexts.getIfAvailable()).thenReturn(() -> Mono.just(principal()));
         when(policies.getIfAvailable()).thenReturn(policy);
-        return new PaymentAccountQuiescenceAuthority(contexts, policies, environment);
+        return new PaymentAccountQuiescenceAuthorityImpl(contexts, policies, environment);
     }
 
-    Mono<PaymentAccountQuiescenceAuthority.Admission> call(PolicyDecisionPort policy) {
+    Mono<PaymentAccountQuiescenceAuthorityImpl.Admission> call(PolicyDecisionPort policy) {
         return authority(policy)
                 .authorize(
                         "bank",

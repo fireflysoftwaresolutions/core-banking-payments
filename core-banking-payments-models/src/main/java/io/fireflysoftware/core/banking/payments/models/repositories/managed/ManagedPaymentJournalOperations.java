@@ -11,6 +11,7 @@ public interface ManagedPaymentJournalOperations {
     Mono<ManagedPaymentOperationEntity> insertOperation(ManagedPaymentOperationEntity row);
     Mono<ManagedPaymentActionEntity> insertAction(ManagedPaymentActionEntity row);
     Mono<ManagedPaymentEffectEntity> insertEffect(ManagedPaymentEffectEntity row);
+    Mono<ManagedPaymentMonetaryProofEntity> insertMonetaryProof(ManagedPaymentMonetaryProofEntity row);
     Mono<ManagedPaymentProjectionEntity> insertProjection(ManagedPaymentProjectionEntity row);
     Mono<ManagedPaymentHistoryEntity> insertHistory(ManagedPaymentHistoryEntity row);
     Mono<ManagedPaymentOutboxEntity> insertOutbox(ManagedPaymentOutboxEntity row);
@@ -18,4 +19,5 @@ public interface ManagedPaymentJournalOperations {
     Mono<Long> saveOperation(OperationUpdate next, long priorVersion);
     Mono<Long> saveProjection(ManagedPaymentProjectionEntity next);
     Mono<Long> acknowledgeEffect(EffectVersion expected);
+    Mono<Long> rescheduleEffect(EffectVersion expected, String state, Instant nextAttempt);
 }

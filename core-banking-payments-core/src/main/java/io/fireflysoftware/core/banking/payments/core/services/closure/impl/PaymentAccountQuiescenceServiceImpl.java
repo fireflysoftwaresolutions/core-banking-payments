@@ -35,16 +35,16 @@ import java.util.function.Supplier;
 
 @Service("paymentAccountQuiescenceService")
 public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccountQuiescenceService {
-    private final PaymentAccountQuiescenceStore store;
-    private final PaymentAccountQuiescenceDatabaseContext context;
-    private final PaymentAccountQuiescenceAuthority authority;
+    private final PaymentAccountQuiescenceStoreImpl store;
+    private final PaymentAccountQuiescenceDatabaseContextImpl context;
+    private final PaymentAccountQuiescenceAuthorityImpl authority;
     private final LedgerFundsObservationPort ledger;
     private final TransactionalOperator tx;
 
     public PaymentAccountQuiescenceServiceImpl(
-            PaymentAccountQuiescenceStore store,
-            PaymentAccountQuiescenceDatabaseContext context,
-            PaymentAccountQuiescenceAuthority authority,
+            PaymentAccountQuiescenceStoreImpl store,
+            PaymentAccountQuiescenceDatabaseContextImpl context,
+            PaymentAccountQuiescenceAuthorityImpl authority,
             LedgerFundsObservationPort ledger,
             ReactiveTransactionManager manager) {
         this.store = store;
@@ -55,7 +55,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
     }
 
     private <T> Mono<T> transaction(
-            PaymentAccountQuiescenceAuthority.Admission admitted, Supplier<Mono<T>> work) {
+            PaymentAccountQuiescenceAuthorityImpl.Admission admitted, Supplier<Mono<T>> work) {
         return Mono.defer(
                         () ->
                                 context.establish(admitted)
@@ -80,7 +80,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                         && (message.contains("CONFLICT")
                                                 || message.contains("QUIESCED"))) return conflict();
                             }
-                            return PaymentAccountQuiescenceStore.unavailable();
+                            return PaymentAccountQuiescenceStoreImpl.unavailable();
                         });
     }
 
@@ -110,9 +110,9 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
     }
 
     public Mono<QuiescenceReceipt> quiesce(String tenant, UUID account, byte[] raw) {
-        return PaymentAccountQuiescenceBoundary.outsideTransaction(
+        return PaymentAccountQuiescenceBoundaryImpl.outsideTransaction(
                 () -> {
-                    var input = PaymentAccountQuiescenceRules.decode(raw);
+                    var input = PaymentAccountQuiescenceRulesImpl.decode(raw);
                     return authority
                             .authorize(
                                     tenant,
@@ -139,7 +139,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                         String digest;
                                         try {
                                             digest =
-                                                    PaymentAccountQuiescenceCanonical.digest(
+                                                    PaymentAccountQuiescenceCanonicalImpl.digest(
                                                             retained.selection(), input);
                                         } catch (RuntimeException e) {
                                             return Mono.error(conflict());
@@ -183,7 +183,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                                     ledger.closureAccount(tenant, account)
                                                             .switchIfEmpty(
                                                                     Mono.error(
-                                                                            PaymentAccountQuiescenceStore
+                                                                            PaymentAccountQuiescenceStoreImpl
                                                                                     .unavailable()))
                                                             .flatMap(
                                                                     observed -> {
@@ -202,7 +202,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                                                                                 .currencyScale(),
                                                                                         observed
                                                                                                 .currencyPolicy());
-                                                                        PaymentAccountQuiescenceRules
+                                                                        PaymentAccountQuiescenceRulesImpl
                                                                                 .admit(
                                                                                         selected,
                                                                                         input,
@@ -215,7 +215,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                                                             return Mono.error(
                                                                                     conflict());
                                                                         var digest =
-                                                                                PaymentAccountQuiescenceCanonical
+                                                                                PaymentAccountQuiescenceCanonicalImpl
                                                                                         .digest(
                                                                                                 selected,
                                                                                                 input);
@@ -249,10 +249,10 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                 });
     }
 
-    private Mono<PaymentAccountQuiescenceStore.Fence> retained(
+    private Mono<PaymentAccountQuiescenceStoreImpl.Fence> retained(
             String tenant, UUID account, UUID closure, String operation) {
-        if (!PaymentAccountQuiescenceRules.uuid(closure))
-            return Mono.error(PaymentAccountQuiescenceRules.bad());
+        if (!PaymentAccountQuiescenceRulesImpl.uuid(closure))
+            return Mono.error(PaymentAccountQuiescenceRulesImpl.bad());
         return authority
                 .authorize(tenant, account, operation, Map.of("closureId", closure.toString()))
                 .flatMap(
@@ -266,7 +266,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
     }
 
     public Mono<View> get(String tenant, UUID account, UUID closure) {
-        return PaymentAccountQuiescenceBoundary.outsideTransaction(
+        return PaymentAccountQuiescenceBoundaryImpl.outsideTransaction(
                 () ->
                         retained(tenant, account, closure, "read")
                                 .flatMap(
@@ -297,17 +297,17 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                                                                                 .switchIfEmpty(
                                                                                                         Mono
                                                                                                                 .error(
-                                                                                                                        PaymentAccountQuiescenceStore
+                                                                                                                        PaymentAccountQuiescenceStoreImpl
                                                                                                                                 .unavailable()))))));
     }
 
     public Mono<ObligationPage> obligations(
             String tenant, UUID account, UUID closure, UUID observation, long after, int limit) {
-        return PaymentAccountQuiescenceBoundary.outsideTransaction(
+        return PaymentAccountQuiescenceBoundaryImpl.outsideTransaction(
                 () -> {
-                    PaymentAccountQuiescenceRules.page(after, limit);
+                    PaymentAccountQuiescenceRulesImpl.page(after, limit);
                     if (observation == null && after != 0)
-                        return Mono.error(PaymentAccountQuiescenceRules.bad());
+                        return Mono.error(PaymentAccountQuiescenceRulesImpl.bad());
                     return retained(tenant, account, closure, "observe")
                             .flatMap(
                                     fence ->
@@ -373,9 +373,9 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
     }
 
     public Mono<ReleaseReceipt> release(String tenant, UUID account, byte[] raw) {
-        return PaymentAccountQuiescenceBoundary.outsideTransaction(
+        return PaymentAccountQuiescenceBoundaryImpl.outsideTransaction(
                 () -> {
-                    var input = PaymentAccountQuiescenceRules.decodeRelease(raw);
+                    var input = PaymentAccountQuiescenceRulesImpl.decodeRelease(raw);
                     return retained(tenant, account, input.closureId(), "release")
                             .flatMap(
                                     fence ->
@@ -389,7 +389,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                                                     input.closureId(),
                                                                     input.actionId(),
                                                                     input.expectedFenceVersion(),
-                                                                    PaymentAccountQuiescenceCanonical
+                                                                    PaymentAccountQuiescenceCanonicalImpl
                                                                             .releaseDigest(
                                                                                     fence
                                                                                             .selection(),
@@ -403,7 +403,7 @@ public final class PaymentAccountQuiescenceServiceImpl implements PaymentAccount
                                                                                             tenant,
                                                                                             account,
                                                                                             input,
-                                                                                            PaymentAccountQuiescenceCanonical
+                                                                                            PaymentAccountQuiescenceCanonicalImpl
                                                                                                     .releaseDigest(
                                                                                                             fence
                                                                                                                     .selection(),

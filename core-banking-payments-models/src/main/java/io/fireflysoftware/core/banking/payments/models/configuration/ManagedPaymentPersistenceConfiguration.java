@@ -14,7 +14,7 @@ import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 public class ManagedPaymentPersistenceConfiguration {
-    public static List<Object> converters() { return List.of(new JsonReader(), new JsonWriter()); }
+    public static List<Object> converters() { return List.of(new JsonReaderImpl(), new JsonWriterImpl()); }
 
     @Bean
     R2dbcCustomConversions r2dbcCustomConversions(ConnectionFactory factory) {
@@ -22,12 +22,12 @@ public class ManagedPaymentPersistenceConfiguration {
     }
 
     @ReadingConverter
-    private static class JsonReader implements Converter<Json, PaymentJson> {
+    private static class JsonReaderImpl implements Converter<Json, PaymentJson> {
         public PaymentJson convert(Json value) { return new PaymentJson(value.asString()); }
     }
 
     @WritingConverter
-    private static class JsonWriter implements Converter<PaymentJson, Json> {
+    private static class JsonWriterImpl implements Converter<PaymentJson, Json> {
         public Json convert(PaymentJson value) { return Json.of(value.value()); }
     }
 }
