@@ -32,14 +32,14 @@ import reactor.core.publisher.Mono;
 import java.time.*;
 import java.util.*;
 
-@Component
-public final class PaymentAccountQuiescenceAuthority {
+@Component("paymentAccountQuiescenceAuthority")
+public final class PaymentAccountQuiescenceAuthorityImpl {
     private static final Set<String> OPERATIONS = Set.of("quiesce", "read", "observe", "release");
     private final ObjectProvider<SecurityContextPort> contexts;
     private final ObjectProvider<PolicyDecisionPort> policies;
     private final Environment environment;
 
-    public PaymentAccountQuiescenceAuthority(
+    public PaymentAccountQuiescenceAuthorityImpl(
             ObjectProvider<SecurityContextPort> contexts,
             ObjectProvider<PolicyDecisionPort> policies,
             Environment environment) {
@@ -67,7 +67,7 @@ public final class PaymentAccountQuiescenceAuthority {
 
     public Mono<Admission> authorize(
             String tenant, UUID account, String operation, Map<String, Object> exact) {
-        return PaymentAccountQuiescenceBoundary.outsideTransaction(
+        return PaymentAccountQuiescenceBoundaryImpl.outsideTransaction(
                 () ->
                         Mono.defer(
                                         () -> {

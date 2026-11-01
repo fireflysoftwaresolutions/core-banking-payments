@@ -973,7 +973,7 @@ class PaymentAccountQuiescenceRuntimeDatabaseTest {
                                         List.of(account.toString(), other.toString())))
                         .build();
         var call =
-                new io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy
+                new io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl
                         .Call(actor, "owned-unused-test-bearer", Set.of());
         for (boolean incoming : List.of(true, false)) {
             var input =
@@ -992,7 +992,7 @@ class PaymentAccountQuiescenceRuntimeDatabaseTest {
                                             .contextWrite(
                                                     c ->
                                                             io.fireflysoftware.core.banking.payments
-                                                                    .core.managed.impl.ManagedPaymentPolicy.with(
+                                                                    .core.managed.impl.ManagedPaymentPolicyImpl.with(
                                                                     c, call))
                                             .block(java.time.Duration.ofSeconds(10)))
                     .isInstanceOfSatisfying(
@@ -1005,7 +1005,7 @@ class PaymentAccountQuiescenceRuntimeDatabaseTest {
                                             .contextWrite(
                                                     c ->
                                                             io.fireflysoftware.core.banking.payments
-                                                                    .core.managed.impl.ManagedPaymentPolicy.with(
+                                                                    .core.managed.impl.ManagedPaymentPolicyImpl.with(
                                                                     c, call))
                                             .block(java.time.Duration.ofSeconds(10)))
                     .isSameAs(unrelated);
@@ -1039,7 +1039,7 @@ class PaymentAccountQuiescenceRuntimeDatabaseTest {
                                             .contextWrite(
                                                     c ->
                                                             io.fireflysoftware.core.banking.payments
-                                                                    .core.managed.impl.ManagedPaymentPolicy.with(
+                                                                    .core.managed.impl.ManagedPaymentPolicyImpl.with(
                                                                     c, call))
                                             .block(java.time.Duration.ofSeconds(10)))
                     .isInstanceOf(org.springframework.dao.DataAccessException.class)
@@ -1297,7 +1297,7 @@ class PaymentAccountQuiescenceRuntimeDatabaseTest {
                                                 ? Decision.permit()
                                                 : Decision.deny("withdrawn")));
         var authority =
-                new PaymentAccountQuiescenceAuthority(
+                new PaymentAccountQuiescenceAuthorityImpl(
                         beans.getBeanProvider(SecurityContextPort.class),
                         beans.getBeanProvider(PolicyDecisionPort.class),
                         new MockEnvironment()

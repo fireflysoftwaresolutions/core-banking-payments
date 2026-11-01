@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.fail;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.fail;
 
 import io.fireflysoftware.core.banking.ledger.sdk.api.LedgerFundsApi;
 import io.fireflysoftware.core.banking.ledger.sdk.invoker.ApiClient;
@@ -32,13 +32,13 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.*;
 
-@Component
-public class SdkLedgerFundsObservationAdapter implements LedgerFundsObservationPort {
+@Component("sdkLedgerFundsObservationAdapter")
+public class SdkLedgerFundsObservationAdapterImpl implements LedgerFundsObservationPort {
     private final PaymentDelegationPort delegation;
     private final String base, audience;
     private final boolean loopback;
 
-    public SdkLedgerFundsObservationAdapter(
+    public SdkLedgerFundsObservationAdapterImpl(
             PaymentDelegationPort delegation,
             @Value("${managed-payments.peers.ledger.base-url:}") String base,
             @Value("${managed-payments.peers.ledger.audience:}") String audience,

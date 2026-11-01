@@ -27,8 +27,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Supplier;
 
-public final class PaymentAccountQuiescenceBoundary {
-    private PaymentAccountQuiescenceBoundary() {}
+public final class PaymentAccountQuiescenceBoundaryImpl {
+    private PaymentAccountQuiescenceBoundaryImpl() {}
 
     public static <T> Mono<T> outsideTransaction(Supplier<Mono<T>> work) {
         return TransactionSynchronizationManager.forCurrentTransaction()

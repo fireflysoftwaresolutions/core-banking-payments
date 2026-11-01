@@ -16,7 +16,7 @@
 
 package io.fireflysoftware.core.banking.payments.core.managed;
 
-import io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy;
+import io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl;
 
 import reactor.core.publisher.Mono;
 
@@ -44,7 +44,7 @@ public interface LedgerFundsObservationPort {
 
     default Mono<EnrolledAccount> closureAccount(String tenant, UUID account) {
         return Mono.error(
-                ManagedPaymentPolicy.fail(503, "QUALIFIED_CLOSURE_ACCOUNT_OBSERVER_REQUIRED"));
+                ManagedPaymentPolicyImpl.fail(503, "QUALIFIED_CLOSURE_ACCOUNT_OBSERVER_REQUIRED"));
     }
 
     record VerifiedFundsObservation(

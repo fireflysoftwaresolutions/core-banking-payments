@@ -18,8 +18,8 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.*;
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentStore.evolve;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.*;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentStoreImpl.evolve;
 
 import io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.*;
 
@@ -33,12 +33,12 @@ import java.util.*;
 
 @Service("managedPaymentCoordinator")
 public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoordinatorService {
-    final ManagedPaymentTransactions transactions;
-    final ManagedPaymentStore store;
+    final ManagedPaymentTransactionsImpl transactions;
+    final ManagedPaymentStoreImpl store;
     final int leaseSeconds;
 
     public ManagedPaymentCoordinatorServiceImpl(
-            ManagedPaymentTransactions transactions,
+            ManagedPaymentTransactionsImpl transactions,
             @Value("${managed-payments.claim-lease-seconds:30}") int leaseSeconds) {
         this.transactions = transactions;
         this.store = transactions.store;
@@ -65,7 +65,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
         if (v.version() != expected) throw fail(409, "PAYMENT_VERSION_CONFLICT");
     }
 
-    static void effectAuthority(Call call, String tenant, ManagedPaymentStore.EffectRow e, View v) {
+    static void effectAuthority(Call call, String tenant, ManagedPaymentStoreImpl.EffectRow e, View v) {
         String scope =
                 switch (e.kind()) {
                     case RESERVE -> "payments:create";
@@ -334,7 +334,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
     }
 
     static void owned(
-            ManagedPaymentStore.EffectRow e,
+            ManagedPaymentStoreImpl.EffectRow e,
             View v,
             Call call,
             Long fence,
@@ -477,7 +477,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
     }
 
     static boolean retained(
-            ManagedPaymentStore.RetainedAction action, UUID payment, String kind, String digest) {
+            ManagedPaymentStoreImpl.RetainedAction action, UUID payment, String kind, String digest) {
         if (!action.payment().equals(payment)
                 || !action.kind().equals(kind)
                 || !action.digest().equals(digest))
@@ -635,7 +635,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
                         });
     }
 
-    record ReversePrepared(View payment, ManagedPaymentStore.CommitOrigin origin, boolean replay) {}
+    record ReversePrepared(View payment, ManagedPaymentStoreImpl.CommitOrigin origin, boolean replay) {}
 
     private static void reverseAuthority(Call call, String tenant, View payment) {
         for (String scope : Set.of("payments:reverse", "funds:reverse", "funds:read", "funds:reconcile"))
@@ -652,7 +652,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
         if (payment.version() == Long.MAX_VALUE) throw fail(409, "PAYMENT_VERSION_EXHAUSTED");
     }
 
-    private static void originalCommit(View payment, ManagedPaymentStore.CommitOrigin origin) {
+    private static void originalCommit(View payment, ManagedPaymentStoreImpl.CommitOrigin origin) {
         var e = origin.effect(); var h = origin.history();
         if (e.kind() != EffectKind.COMMIT || !"ACKNOWLEDGED".equals(e.state())
                 || !Objects.equals(h.effectId(), e.id()) || !"LEDGER_COMMITTED".equals(h.type())
@@ -798,7 +798,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
                                                                                                                         409,
                                                                                                                         "PAYMENT_HAS_NO_RECOVERY_WORK"));
                                                                                             Mono<
-                                                                                                            ManagedPaymentStore
+                                                                                                            ManagedPaymentStoreImpl
                                                                                                                     .EffectRow>
                                                                                                     effect =
                                                                                                             v

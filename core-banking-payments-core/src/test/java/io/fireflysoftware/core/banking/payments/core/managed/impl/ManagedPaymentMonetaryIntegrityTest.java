@@ -81,8 +81,8 @@ class ManagedPaymentMonetaryIntegrityTest {
                 reverse ? 102 : 101, id(4), id(5), reverse ? id(10) : null, null, reverse ? 3L : 1L,
                 Instant.parse("2026-10-24T01:02:03Z"), reverse ? null : id(22), null, reverse ? "REVERSED" : "COMMITTED", Instant.ofEpochMilli(1700000300000L));
     }
-    private static ManagedPaymentStore.EffectRow effect(boolean reverse) {
-        return new ManagedPaymentStore.EffectRow(reverse ? id(22) : id(20), reverse ? id(23) : id(21),
+    private static ManagedPaymentStoreImpl.EffectRow effect(boolean reverse) {
+        return new ManagedPaymentStoreImpl.EffectRow(reverse ? id(22) : id(20), reverse ? id(23) : id(21),
                 reverse ? ManagedPaymentContracts.EffectKind.REVERSE : ManagedPaymentContracts.EffectKind.COMMIT,
                 "ACKNOWLEDGED", reverse ? 1 : 2, 2, null, null, reverse ? id(20) : null, reverse ? 100L : null, reverse ? id(4) : null);
     }
@@ -94,7 +94,7 @@ class ManagedPaymentMonetaryIntegrityTest {
         final ManagedPaymentMonetaryProofRepository proofs = mock(ManagedPaymentMonetaryProofRepository.class);
         final ManagedPaymentJournalRepository journal = mock(ManagedPaymentJournalRepository.class);
         final List<ManagedPaymentMonetaryProofEntity> inserted = new ArrayList<>();
-        final ManagedPaymentStore store = new ManagedPaymentStore(mock(ManagedPaymentOperationRepository.class), mock(ManagedPaymentActionRepository.class),
+        final ManagedPaymentStoreImpl store = new ManagedPaymentStoreImpl(mock(ManagedPaymentOperationRepository.class), mock(ManagedPaymentActionRepository.class),
                 mock(ManagedPaymentEffectRepository.class), mock(ManagedPaymentHistoryRepository.class), proofs, journal, mock(ManagedPaymentNativeRepository.class));
         Fixture() {
             when(journal.insertMonetaryProof(any())).thenAnswer(call -> {
@@ -238,10 +238,10 @@ class ManagedPaymentMonetaryIntegrityTest {
             return Mono.fromRunnable(rolledBack::incrementAndGet);
         }
     }
-    private static ManagedPaymentTransactions owner(Fixture f, SourceTransactionManager manager) {
-        var context = mock(ManagedPaymentDatabaseContext.class);
+    private static ManagedPaymentTransactionsImpl owner(Fixture f, SourceTransactionManager manager) {
+        var context = mock(ManagedPaymentDatabaseContextImpl.class);
         when(context.establish(isNull(), anyString(), anyString(), anyString(), any(UUID[].class))).thenReturn(Mono.empty());
-        return new ManagedPaymentTransactions(f.store, context,
+        return new ManagedPaymentTransactionsImpl(f.store, context,
                 mock(io.fireflysoftware.core.banking.payments.core.managed.LedgerFundsObservationPort.class), manager);
     }
     @Test void invalidCanonicalReceiptIsCheckedInsideOriginalOwnerAndRollsBack() {

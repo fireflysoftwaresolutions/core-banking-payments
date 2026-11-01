@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.*;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.*;
 
 import io.fireflysoftware.core.banking.payments.core.managed.LedgerFundsObservationPort.*;
 import io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.*;
@@ -31,13 +31,13 @@ import java.util.UUID;
 
 @Service("managedPaymentObservationService")
 public class ManagedPaymentObservationServiceImpl implements ManagedPaymentObservationService {
-    private final ManagedPaymentTransactions transactions;
+    private final ManagedPaymentTransactionsImpl transactions;
     private final ManagedPaymentCoordinatorService coordinator;
-    private final ManagedPaymentStore store;
+    private final ManagedPaymentStoreImpl store;
     private final LedgerFundsObservationPort ledger;
 
     public ManagedPaymentObservationServiceImpl(
-            ManagedPaymentTransactions transactions,
+            ManagedPaymentTransactionsImpl transactions,
             ManagedPaymentCoordinatorService coordinator,
             LedgerFundsObservationPort ledger) {
         this.transactions = transactions;
@@ -46,7 +46,7 @@ public class ManagedPaymentObservationServiceImpl implements ManagedPaymentObser
         this.ledger = ledger;
     }
 
-    record Prepared(View payment, ManagedPaymentStore.EffectRow effect) {}
+    record Prepared(View payment, ManagedPaymentStoreImpl.EffectRow effect) {}
 
     record Observation(VerifiedFundsObservation receipt, FailureCode failure) {}
 
@@ -367,7 +367,7 @@ public class ManagedPaymentObservationServiceImpl implements ManagedPaymentObser
             io.fireflysoftware.core.banking.payments.models.entities.managed.ManagedPaymentMonetaryProofEntity original) {}
     record MonetaryObservation(VerifiedMonetaryObservation receipt, FailureCode failure) {}
 
-    private ReversePrepared reverseOrigin(Prepared prepared, ManagedPaymentStore.CommitOrigin origin,
+    private ReversePrepared reverseOrigin(Prepared prepared, ManagedPaymentStoreImpl.CommitOrigin origin,
             io.fireflysoftware.core.banking.payments.models.entities.managed.ManagedPaymentMonetaryProofEntity proof) {
         var v = prepared.payment(); var e = prepared.effect();
         if (e.originalEffectId() == null || e.originalCommitVersion() == null || e.originalReservationId() == null
@@ -401,7 +401,7 @@ public class ManagedPaymentObservationServiceImpl implements ManagedPaymentObser
                 value.actionId(), value.receiptId(), envelope.canonical().digest(), value.postingId(), minimumOwner), proof);
     }
 
-    private Mono<View> acknowledgeReverse(ManagedPaymentPolicy.Call call, String tenant, UUID payment,
+    private Mono<View> acknowledgeReverse(ManagedPaymentPolicyImpl.Call call, String tenant, UUID payment,
             Acknowledge input, Prepared first) {
         return transactions.transaction(call, tenant, "READ", "payments:coordinate", accounts(call),
                 () -> store.gate(tenant, payment).then(store.read(tenant, payment)

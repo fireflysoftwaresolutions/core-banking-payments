@@ -45,7 +45,7 @@ class SdkLedgerFundsClosureObservationTest {
 
     @Test
     void blockedAccountRetainsTrueLedgerTupleForRecovery() {
-        var result = SdkLedgerFundsObservationAdapter.closureTuple("bank", id, account());
+        var result = SdkLedgerFundsObservationAdapterImpl.closureTuple("bank", id, account());
         assertThat(result.accountId()).isEqualTo(id);
         assertThat(result.enrollmentId()).isEqualTo(enrollment);
         assertThat(result.contractId()).isEqualTo(contract);
@@ -87,7 +87,7 @@ class SdkLedgerFundsClosureObservationTest {
     }
 
     void denied(Account value) {
-        assertThatThrownBy(() -> SdkLedgerFundsObservationAdapter.closureTuple("bank", id, value))
+        assertThatThrownBy(() -> SdkLedgerFundsObservationAdapterImpl.closureTuple("bank", id, value))
                 .isInstanceOf(ResponseStatusException.class);
     }
 }

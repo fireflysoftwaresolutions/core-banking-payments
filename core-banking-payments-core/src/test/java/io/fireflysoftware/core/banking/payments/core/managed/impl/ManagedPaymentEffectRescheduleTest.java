@@ -3,7 +3,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentStore.EffectRow;
+import io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentStoreImpl.EffectRow;
 import io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.EffectKind;
 import io.fireflysoftware.core.banking.payments.models.repositories.managed.*;
 import java.time.*;
@@ -39,7 +39,7 @@ class ManagedPaymentEffectRescheduleTest {
         }
         return RETURNS_DEFAULTS.answer(call);
     });
-    private final ManagedPaymentStore store = new ManagedPaymentStore(mock(ManagedPaymentOperationRepository.class),
+    private final ManagedPaymentStoreImpl store = new ManagedPaymentStoreImpl(mock(ManagedPaymentOperationRepository.class),
             mock(ManagedPaymentActionRepository.class), mock(ManagedPaymentEffectRepository.class),
             mock(ManagedPaymentHistoryRepository.class), mock(ManagedPaymentMonetaryProofRepository.class), journal, nativeRepository);
     private final UUID effectId = UUID.fromString("00000000-0000-0000-0000-000000000041");

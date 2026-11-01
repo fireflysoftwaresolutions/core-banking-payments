@@ -47,8 +47,8 @@ class ManagedPaymentRepositoryNativeIT {
     private static ManagedPaymentEffectRepository effects;
     private static ManagedPaymentHistoryRepository histories;
     private static ManagedPaymentJournalRepository journal;
-    private static ManagedPaymentDatabaseContext context;
-    private static ManagedPaymentStore store;
+    private static ManagedPaymentDatabaseContextImpl context;
+    private static ManagedPaymentStoreImpl store;
     private static TransactionalOperator tx;
     private String tenant;
     private UUID source;
@@ -92,8 +92,8 @@ class ManagedPaymentRepositoryNativeIT {
         histories = factory.getRepository(ManagedPaymentHistoryRepository.class);
         journal = factory.getRepository(ManagedPaymentJournalRepository.class,
                 RepositoryFragments.just(new ManagedPaymentJournalOperationsImpl(template)));
-        context = new ManagedPaymentDatabaseContext(template, nativeRepository);
-        store = new ManagedPaymentStore(operations, actions, effects, histories, factory.getRepository(ManagedPaymentMonetaryProofRepository.class), journal, nativeRepository);
+        context = new ManagedPaymentDatabaseContextImpl(template, nativeRepository);
+        store = new ManagedPaymentStoreImpl(operations, actions, effects, histories, factory.getRepository(ManagedPaymentMonetaryProofRepository.class), journal, nativeRepository);
         tx = TransactionalOperator.create(new R2dbcTransactionManager(pool));
     }
 
@@ -106,12 +106,12 @@ class ManagedPaymentRepositoryNativeIT {
         source = UUID.randomUUID(); destination = UUID.randomUUID(); TRACE.clear();
     }
 
-    private ManagedPaymentPolicy.Call caller(String tenant, UUID... grants) {
+    private ManagedPaymentPolicyImpl.Call caller(String tenant, UUID... grants) {
         var principal = SecurityPrincipal.builder().subject("owned-native-persistence").issuer("https://owned.invalid")
                 .tenantId(tenant).scopes(Set.of("payments:create", "payments:read"))
                 .claims(Map.of("exp", Instant.now().plusSeconds(120), "funds_accounts",
                         Arrays.stream(grants).map(UUID::toString).toList())).build();
-        return new ManagedPaymentPolicy.Call(principal, "unused-owned-fixture-credential", Set.of());
+        return new ManagedPaymentPolicyImpl.Call(principal, "unused-owned-fixture-credential", Set.of());
     }
 
     private <T> Mono<T> scope(String selected, String purpose, Supplier<Mono<T>> work, UUID... grants) {
@@ -304,7 +304,7 @@ class ManagedPaymentRepositoryNativeIT {
                 .then(store.accountGates(tenant, source, destination))
                 .then(nativeRepository.now()).flatMap(now -> store.effect(tenant, value.pendingEffectId())
                         .flatMap(pending -> store.claimEffect(tenant, pending, "owned-native-persistence", Instant.ofEpochMilli(now + 30000))))
-                .then(store.save(ManagedPaymentStore.evolve(value, State.RESERVING, value.pendingEffectId(), null),
+                .then(store.save(ManagedPaymentStoreImpl.evolve(value, State.RESERVING, value.pendingEffectId(), null),
                         "EFFECT_CLAIMED", "owned-native-persistence", value.createActionId(), value.pendingEffectId())));
         assertThat(TRACE.stream().map(Execution::connection).distinct()).hasSize(1);
         assertThat(TRACE.stream().map(Execution::operation)).contains("beginTransaction", "commitTransaction");

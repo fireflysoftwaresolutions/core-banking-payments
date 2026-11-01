@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.fail;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.fail;
 import io.fireflysoftware.core.banking.payments.interfaces.dtos.managed.ManagedPaymentContracts.*;
 import io.fireflysoftware.core.banking.payments.models.entities.managed.*;
 import io.fireflysoftware.core.banking.payments.models.repositories.managed.*;
@@ -34,8 +34,8 @@ import org.springframework.data.domain.PageRequest;
 import reactor.core.publisher.*;
 import java.util.*;
 
-@Component
-public final class ManagedPaymentStore {
+@Component("managedPaymentStore")
+public final class ManagedPaymentStoreImpl {
     private static final ObjectReader MONETARY_RECEIPT = new ObjectMapper()
             .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION)
             .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
@@ -50,7 +50,7 @@ public final class ManagedPaymentStore {
     private final ObjectMapper json = new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    public ManagedPaymentStore(ManagedPaymentOperationRepository operations,
+    public ManagedPaymentStoreImpl(ManagedPaymentOperationRepository operations,
             ManagedPaymentActionRepository actions, ManagedPaymentEffectRepository effects,
             ManagedPaymentHistoryRepository histories, ManagedPaymentMonetaryProofRepository monetaryProofs,
             ManagedPaymentJournalRepository journal,

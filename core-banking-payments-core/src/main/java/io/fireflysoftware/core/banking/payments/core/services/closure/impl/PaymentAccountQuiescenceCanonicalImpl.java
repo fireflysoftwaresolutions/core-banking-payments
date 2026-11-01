@@ -25,14 +25,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-public final class PaymentAccountQuiescenceCanonical {
-    private PaymentAccountQuiescenceCanonical() {}
+public final class PaymentAccountQuiescenceCanonicalImpl {
+    private PaymentAccountQuiescenceCanonicalImpl() {}
 
     public static String canonical(Selection selected, Quiesce input) {
-        PaymentAccountQuiescenceRules.selection(selected);
-        PaymentAccountQuiescenceRules.basic(input);
+        PaymentAccountQuiescenceRulesImpl.selection(selected);
+        PaymentAccountQuiescenceRulesImpl.basic(input);
         if (!selected.enrollmentId().equals(input.enrollmentId()))
-            throw PaymentAccountQuiescenceRules.bad();
+            throw PaymentAccountQuiescenceRulesImpl.bad();
         var value = new StringBuilder("PAYMENT_ACCOUNT_QUIESCENCE_V1\n");
         for (String field :
                 new String[] {
@@ -66,8 +66,8 @@ public final class PaymentAccountQuiescenceCanonical {
     }
 
     public static String releaseDigest(Selection selected, Release input) {
-        PaymentAccountQuiescenceRules.selection(selected);
-        PaymentAccountQuiescenceRules.release(input);
+        PaymentAccountQuiescenceRulesImpl.selection(selected);
+        PaymentAccountQuiescenceRulesImpl.release(input);
         String retained =
                 canonical(
                         selected,

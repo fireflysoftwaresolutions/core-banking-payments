@@ -33,12 +33,12 @@ class ManagedPaymentReversalPersistenceNativeIT {
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
     private static final String OBSERVER = "owned-native-observer";
     private static ConnectionPool pool;
-    private static ManagedPaymentStore store;
+    private static ManagedPaymentStoreImpl store;
     private static ManagedPaymentJournalRepository journal;
     private static ManagedPaymentEffectRepository effects;
     private static ManagedPaymentMonetaryProofRepository proofs;
     private static ManagedPaymentOperationRepository operations;
-    private static ManagedPaymentDatabaseContext context;
+    private static ManagedPaymentDatabaseContextImpl context;
     private static TransactionalOperator tx;
 
     @BeforeAll
@@ -59,9 +59,9 @@ class ManagedPaymentReversalPersistenceNativeIT {
         operations = factory.getRepository(ManagedPaymentOperationRepository.class);
         effects = factory.getRepository(ManagedPaymentEffectRepository.class);
         proofs = factory.getRepository(ManagedPaymentMonetaryProofRepository.class);
-        store = new ManagedPaymentStore(operations,factory.getRepository(ManagedPaymentActionRepository.class),effects,
+        store = new ManagedPaymentStoreImpl(operations,factory.getRepository(ManagedPaymentActionRepository.class),effects,
                 factory.getRepository(ManagedPaymentHistoryRepository.class),proofs,journal,nativeRepository);
-        context = new ManagedPaymentDatabaseContext(template,nativeRepository);
+        context = new ManagedPaymentDatabaseContextImpl(template,nativeRepository);
         tx = TransactionalOperator.create(new R2dbcTransactionManager(pool));
     }
 
@@ -98,11 +98,11 @@ class ManagedPaymentReversalPersistenceNativeIT {
                     reverseAction,accepted,reversal,receipt,posting,recorded+2000,reverseEffect,actor));
         }
 
-        ManagedPaymentPolicy.Call caller() {
+        ManagedPaymentPolicyImpl.Call caller() {
             var p=SecurityPrincipal.builder().issuer("https://owned-context.invalid").subject(OBSERVER).tenantId(tenant)
                     .scopes(Set.of("payments:create","payments:read"))
                     .claims(Map.of("exp",Instant.now().plusSeconds(120),"funds_accounts",List.of(source.toString(),target.toString()))).build();
-            return new ManagedPaymentPolicy.Call(p,"unused-native-context",Set.of());
+            return new ManagedPaymentPolicyImpl.Call(p,"unused-native-context",Set.of());
         }
 
         <T> Mono<T> scoped(String purpose,Supplier<Mono<T>> work) {
@@ -134,7 +134,7 @@ class ManagedPaymentReversalPersistenceNativeIT {
 
         Mono<View> admission(boolean proofFirst) {
             return locks().then(store.commitOrigin(completed)).flatMap(origin -> {
-                admitted=ManagedPaymentStore.evolve(completed,State.REVERSING,reverse,null);
+                admitted=ManagedPaymentStoreImpl.evolve(completed,State.REVERSING,reverse,null);
                 var row=new ManagedPaymentEffectEntity(new ManagedPaymentIds.EffectId(tenant,reverse),payment,source,target,
                         reverseAction,"REVERSE","PENDING",0L,0,null,null,null,commit,1L,reservation);
                 Mono<Void> proof=Mono.defer(() -> store.retainMonetaryProof(admitted,origin.effect(),verified(commitEnvelope),funds(false),OBSERVER));

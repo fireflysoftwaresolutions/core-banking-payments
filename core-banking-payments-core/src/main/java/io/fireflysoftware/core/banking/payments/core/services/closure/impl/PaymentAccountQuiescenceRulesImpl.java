@@ -22,8 +22,8 @@ import static io.fireflysoftware.core.banking.payments.interfaces.dtos.closure.P
 
 import java.util.*;
 
-public final class PaymentAccountQuiescenceRules {
-    private PaymentAccountQuiescenceRules() {}
+public final class PaymentAccountQuiescenceRulesImpl {
+    private PaymentAccountQuiescenceRulesImpl() {}
 
     public static Quiesce decode(byte[] raw) {
         var value =

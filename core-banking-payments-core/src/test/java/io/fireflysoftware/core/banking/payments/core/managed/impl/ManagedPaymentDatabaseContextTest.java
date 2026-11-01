@@ -42,12 +42,12 @@ class ManagedPaymentDatabaseContextTest {
     private final DatabaseClient database = mock(DatabaseClient.class);
     private final org.springframework.data.r2dbc.core.R2dbcEntityOperations operations = mock(org.springframework.data.r2dbc.core.R2dbcEntityOperations.class);
     private final io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentNativeRepository nativeRepository = mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentNativeRepository.class);
-    private ManagedPaymentDatabaseContext context;
+    private ManagedPaymentDatabaseContextImpl context;
 
     private Mono<Void> establish() {
         when(database.getConnectionFactory()).thenReturn(owned);
         when(operations.getDatabaseClient()).thenReturn(database);
-        context = new ManagedPaymentDatabaseContext(operations, nativeRepository);
+        context = new ManagedPaymentDatabaseContextImpl(operations, nativeRepository);
         when(nativeRepository.runtimeAllowed()).thenThrow(new AssertionError("Repository I/O before native transaction proof"));
         when(database.sql(anyString()))
                 .thenThrow(new AssertionError("SQL before native transaction proof"));
@@ -67,7 +67,7 @@ class ManagedPaymentDatabaseContextTest {
         return Mono.defer(
                 () ->
                         context.establish(
-                                new ManagedPaymentPolicy.Call(principal, "unused", Set.of()),
+                                new ManagedPaymentPolicyImpl.Call(principal, "unused", Set.of()),
                                 "bank",
                                 "CREATE",
                                 account));

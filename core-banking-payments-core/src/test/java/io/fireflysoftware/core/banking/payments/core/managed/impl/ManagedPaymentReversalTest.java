@@ -42,11 +42,11 @@ class ManagedPaymentReversalTest {
                 null, 1L, Instant.parse("2023-11-14T22:13:21Z"), null, null, "COMMITTED",
                 Instant.ofEpochMilli(1700000300000L));
     }
-    private static ManagedPaymentPolicy.Call call(Set<String> scopes) {
+    private static ManagedPaymentPolicyImpl.Call call(Set<String> scopes) {
         var p = SecurityPrincipal.builder().subject("current-reverse-reader").issuer("https://unit.invalid")
                 .tenantId("owned").scopes(scopes).claims(Map.of("exp", Instant.now().plusSeconds(60),
                         "funds_accounts", List.of(id(2).toString(), id(3).toString()))).build();
-        return new ManagedPaymentPolicy.Call(p, "unit-context-only", Set.of("payments-core", "ledger-funds"));
+        return new ManagedPaymentPolicyImpl.Call(p, "unit-context-only", Set.of("payments-core", "ledger-funds"));
     }
     private static Set<String> allowed() {
         return Set.of("payments:reverse", "funds:reverse", "payments:coordinate", "payments:recover",
@@ -89,23 +89,23 @@ class ManagedPaymentReversalTest {
         final AtomicInteger proofWrites = new AtomicInteger();
         final AtomicInteger acknowledgments = new AtomicInteger();
         final Map<UUID,ManagedPaymentMonetaryProofEntity> proofRows = new HashMap<>();
-        ManagedPaymentStore.EffectRow claimed;
+        ManagedPaymentStoreImpl.EffectRow claimed;
         boolean reverseUnavailable, wrongReverseParticipant;
-        final Map<UUID,ManagedPaymentStore.RetainedAction> actions = new HashMap<>();
+        final Map<UUID,ManagedPaymentStoreImpl.RetainedAction> actions = new HashMap<>();
         final List<String> purposes = new ArrayList<>();
         boolean fenced, changeVersionDuringPeerRead;
-        final ManagedPaymentStore store;
+        final ManagedPaymentStoreImpl store;
         final LedgerFundsObservationPort ledger = mock(LedgerFundsObservationPort.class);
         final ManagedPaymentCoordinatorServiceImpl service;
-        final ManagedPaymentTransactions transactions;
+        final ManagedPaymentTransactionsImpl transactions;
         Fixture() {
-            store = mock(ManagedPaymentStore.class, invocation -> {
+            store = mock(ManagedPaymentStoreImpl.class, invocation -> {
                 String name = invocation.getMethod().getName();
                 return switch (name) {
                     case "gate" -> Mono.empty();
                     case "decode" -> new com.fasterxml.jackson.databind.ObjectMapper().readValue(
                             (String)invocation.getArgument(0),(Class<?>)invocation.getArgument(1));
-                    case "accountGates" -> fenced ? Mono.error(ManagedPaymentPolicy.fail(409,"PAYMENT_ACCOUNT_QUIESCED")) : Mono.empty();
+                    case "accountGates" -> fenced ? Mono.error(ManagedPaymentPolicyImpl.fail(409,"PAYMENT_ACCOUNT_QUIESCED")) : Mono.empty();
                     case "read" -> Mono.just(current.get());
                     case "now" -> Mono.just(System.currentTimeMillis());
                     case "effect" -> Mono.just(claimed);
@@ -117,14 +117,14 @@ class ManagedPaymentReversalTest {
                         var e = effect(false);
                         var h = new HistoryEvent(68, "LEDGER_COMMITTED", "original-executor", Instant.EPOCH,
                                 null, id(20), State.COMPLETED, id(5), null);
-                        var type = Class.forName(ManagedPaymentStore.class.getName()+"$CommitOrigin");
-                        yield Mono.just(type.getDeclaredConstructor(ManagedPaymentStore.EffectRow.class,
+                        var type = Class.forName(ManagedPaymentStoreImpl.class.getName()+"$CommitOrigin");
+                        yield Mono.just(type.getDeclaredConstructor(ManagedPaymentStoreImpl.EffectRow.class,
                                 HistoryEvent.class).newInstance(e,h));
                     }
                     case "insertReverseEffect" -> Mono.just(effect(true));
                     case "retainMonetaryProof" -> {
                         proofWrites.incrementAndGet();
-                        View v = invocation.getArgument(0); ManagedPaymentStore.EffectRow effect = invocation.getArgument(1);
+                        View v = invocation.getArgument(0); ManagedPaymentStoreImpl.EffectRow effect = invocation.getArgument(1);
                         VerifiedMonetaryProof proof = invocation.getArgument(2); VerifiedFundsObservation funds = invocation.getArgument(3);
                         proofRows.put(effect.id(),new ManagedPaymentMonetaryProofEntity(new ManagedPaymentIds.ProofId("owned",effect.id()),
                                 v.paymentId(),v.sourceAccountId(),v.destinationAccountId(),effect.participant(),effect.kind().name(),
@@ -134,7 +134,7 @@ class ManagedPaymentReversalTest {
                     }
                     case "insertAction" -> {
                         View v = invocation.getArgument(0); UUID action = invocation.getArgument(1);
-                        actions.put(action,new ManagedPaymentStore.RetainedAction(v.paymentId(),
+                        actions.put(action,new ManagedPaymentStoreImpl.RetainedAction(v.paymentId(),
                                 invocation.getArgument(2),invocation.getArgument(3),invocation.getArgument(4),null));
                         yield Mono.empty();
                     }
@@ -142,10 +142,10 @@ class ManagedPaymentReversalTest {
                     default -> throw new AssertionError("Unexpected source store boundary: "+name);
                 };
             });
-            var context = mock(ManagedPaymentDatabaseContext.class);
+            var context = mock(ManagedPaymentDatabaseContextImpl.class);
             when(context.establish(any(),anyString(),anyString(),anyString(),any(UUID[].class)))
                     .thenAnswer(invocation -> { purposes.add(invocation.getArgument(2)); return Mono.empty(); });
-            transactions = new ManagedPaymentTransactions(store,context,ledger,new SourceTransactionManager());
+            transactions = new ManagedPaymentTransactionsImpl(store,context,ledger,new SourceTransactionManager());
             service = new ManagedPaymentCoordinatorServiceImpl(transactions,30);
             when(ledger.observeMonetary(anyString(),any(),any())).thenAnswer(invocation ->
                     TransactionSynchronizationManager.forCurrentTransaction()
@@ -155,7 +155,7 @@ class ManagedPaymentReversalTest {
                                 assertThat(active).as("peer I/O outside source transaction").isFalse();
                                 peerReads.incrementAndGet();
                                 var expected = (MonetaryExpectation)invocation.getArgument(2);
-                                if(changeVersionDuringPeerRead) current.set(ManagedPaymentStore.evolve(current.get(),current.get().state(),current.get().pendingEffectId(),null));
+                                if(changeVersionDuringPeerRead) current.set(ManagedPaymentStoreImpl.evolve(current.get(),current.get().state(),current.get().pendingEffectId(),null));
                                 if(expected.kind()==MonetaryKind.REVERSE && reverseUnavailable)
                                     return Mono.error(new ObservationUnavailable(FailureCode.OBSERVATION_UNAVAILABLE));
                                 var reverse = expected.kind()==MonetaryKind.REVERSE ? proof(true) : null;
@@ -168,14 +168,14 @@ class ManagedPaymentReversalTest {
             when(ledger.observe(anyString(),any())).thenAnswer(invocation -> Mono.just(funds(!reverseUnavailable)));
 
         }
-        static ManagedPaymentStore.EffectRow effect(boolean reverse) throws Exception {
+        static ManagedPaymentStoreImpl.EffectRow effect(boolean reverse) throws Exception {
             var kind = reverse ? EffectKind.valueOf("REVERSE") : EffectKind.COMMIT;
-            var type = ManagedPaymentStore.EffectRow.class;
+            var type = ManagedPaymentStoreImpl.EffectRow.class;
             Object[] basic = {reverse?id(22):id(20),reverse?id(23):id(21),kind,
                     reverse?"PENDING":"ACKNOWLEDGED",reverse?0L:2L,reverse?0:2,null,null};
             var values = new ArrayList<>(Arrays.asList(basic));
             if(type.getRecordComponents().length>8) values.addAll(Arrays.asList(reverse?id(20):null,reverse?68L:null,reverse?id(4):null));
-            return (ManagedPaymentStore.EffectRow)type.getDeclaredConstructor(Arrays.stream(type.getRecordComponents())
+            return (ManagedPaymentStoreImpl.EffectRow)type.getDeclaredConstructor(Arrays.stream(type.getRecordComponents())
                     .map(java.lang.reflect.RecordComponent::getType).toArray(Class<?>[]::new)).newInstance(values.toArray());
         }
         static VerifiedFundsObservation funds(boolean reversed) {
@@ -183,18 +183,18 @@ class ManagedPaymentReversalTest {
                     null,reversed?3L:2L,Instant.parse("2026-10-24T01:02:03Z"),Instant.ofEpochMilli(1700000300000L));
         }
         void claimSelectedReverse() throws Exception {
-            current.set(ManagedPaymentStore.evolve(current.get(),State.valueOf("REVERSING"),id(22),null));
-            claimed = new ManagedPaymentStore.EffectRow(id(22),id(23),EffectKind.valueOf("REVERSE"),"CLAIMED",1L,1,
+            current.set(ManagedPaymentStoreImpl.evolve(current.get(),State.valueOf("REVERSING"),id(22),null));
+            claimed = new ManagedPaymentStoreImpl.EffectRow(id(22),id(23),EffectKind.valueOf("REVERSE"),"CLAIMED",1L,1,
                     "current-reverse-reader",Instant.now().plusSeconds(30),id(20),68L,id(4));
         }
-        Mono<View> acknowledge(ManagedPaymentPolicy.Call call) {
+        Mono<View> acknowledge(ManagedPaymentPolicyImpl.Call call) {
             return new ManagedPaymentObservationServiceImpl(transactions,service,ledger)
                     .acknowledge("owned",id(1),new Acknowledge(id(22),1L,current.get().version()))
-                    .contextWrite(context -> ManagedPaymentPolicy.with(context,call));
+                    .contextWrite(context -> ManagedPaymentPolicyImpl.with(context,call));
         }
-        Mono<View> reverse(ManagedPaymentPolicy.Call call) {
+        Mono<View> reverse(ManagedPaymentPolicyImpl.Call call) {
             return service.decide("owned",id(1),new Decision(id(24),reverseKind(),100L))
-                    .contextWrite(context -> ManagedPaymentPolicy.with(context,call));
+                    .contextWrite(context -> ManagedPaymentPolicyImpl.with(context,call));
         }
     }
 
@@ -294,7 +294,7 @@ class ManagedPaymentReversalTest {
                 kind==EffectKind.COMMIT?State.COMMITTING:State.RECOVERY_REQUIRED,100,prior.reservationId(),
                 kind==EffectKind.COMMIT?null:prior.postingId(),null,null,1L,prior.observedAt(),id(22),null,
                 kind==EffectKind.COMMIT?"HELD":"COMMITTED",prior.reservationExpiresAt()));
-        fixture.claimed = new ManagedPaymentStore.EffectRow(id(22),id(23),kind,"CLAIMED",1L,1,
+        fixture.claimed = new ManagedPaymentStoreImpl.EffectRow(id(22),id(23),kind,"CLAIMED",1L,1,
                 "current-reverse-reader",Instant.now().plusSeconds(30));
         var scopes = new HashSet<>(allowed()); scopes.add("funds:commit");
         var before = fixture.current.get();
@@ -363,7 +363,7 @@ class ManagedPaymentReversalTest {
         var histories = mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentHistoryRepository.class);
         var journal = mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentJournalRepository.class);
         var nativeRepository = mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentNativeRepository.class);
-        var store = new ManagedPaymentStore(mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentOperationRepository.class),
+        var store = new ManagedPaymentStoreImpl(mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentOperationRepository.class),
                 mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentActionRepository.class), effects,
                 histories,mock(io.fireflysoftware.core.banking.payments.models.repositories.managed.ManagedPaymentMonetaryProofRepository.class),journal,nativeRepository);
         when(effects.findByIdTenantIdAndPaymentIdAndKind("owned",id(1),"COMMIT"))
@@ -383,7 +383,7 @@ class ManagedPaymentReversalTest {
             org.springframework.data.domain.Pageable page = invocation.getArgument(3);
             return reactor.core.publisher.Flux.fromIterable(rows).filter(row -> row.id().version()>after).take(page.getPageSize());
         });
-        View current = completed(); for(int i=0;i<100;i++) current=ManagedPaymentStore.evolve(current,State.COMPLETED,null,null);
+        View current = completed(); for(int i=0;i<100;i++) current=ManagedPaymentStoreImpl.evolve(current,State.COMPLETED,null,null);
         var origin = store.commitOrigin(current).block();
         assertThat(origin.history().version()).isEqualTo(150);
         assertThat(origin.effect().participant()).isEqualTo(id(21));

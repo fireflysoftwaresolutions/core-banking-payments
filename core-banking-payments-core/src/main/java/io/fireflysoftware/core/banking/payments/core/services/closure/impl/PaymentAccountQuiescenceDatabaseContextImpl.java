@@ -26,26 +26,26 @@ import org.springframework.transaction.NoTransactionException;
 import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 import reactor.core.publisher.Mono;
 
-@Component
-public final class PaymentAccountQuiescenceDatabaseContext {
+@Component("paymentAccountQuiescenceDatabaseContext")
+public final class PaymentAccountQuiescenceDatabaseContextImpl {
     private final ConnectionFactory factory;
     private final PaymentAccountNativeRepository nativeRepository;
 
-    public PaymentAccountQuiescenceDatabaseContext(R2dbcEntityOperations operations, PaymentAccountNativeRepository nativeRepository) {
+    public PaymentAccountQuiescenceDatabaseContextImpl(R2dbcEntityOperations operations, PaymentAccountNativeRepository nativeRepository) {
         this.factory = operations.getDatabaseClient().getConnectionFactory();
         this.nativeRepository = nativeRepository;
     }
 
-    Mono<Void> establish(PaymentAccountQuiescenceAuthority.Admission admission) {
+    Mono<Void> establish(PaymentAccountQuiescenceAuthorityImpl.Admission admission) {
         return TransactionSynchronizationManager.forCurrentTransaction()
-                .onErrorMap(NoTransactionException.class, error -> PaymentAccountQuiescenceStore.unavailable())
+                .onErrorMap(NoTransactionException.class, error -> PaymentAccountQuiescenceStoreImpl.unavailable())
                 .flatMap(manager -> {
                     if (!manager.isActualTransactionActive() || !manager.hasResource(factory))
-                        return Mono.error(PaymentAccountQuiescenceStore.unavailable());
+                        return Mono.error(PaymentAccountQuiescenceStoreImpl.unavailable());
                     admission.requireCurrent();
                     return nativeRepository.runtimeAllowed(admission.validUntilEpochMillis())
                             .filter(Boolean.TRUE::equals)
-                            .switchIfEmpty(Mono.error(PaymentAccountQuiescenceStore.unavailable()))
+                            .switchIfEmpty(Mono.error(PaymentAccountQuiescenceStoreImpl.unavailable()))
                             .then(Mono.defer(() -> {
                                 admission.requireCurrent();
                                 return nativeRepository.establishContext(admission.tenantId(), admission.accountId().toString(),

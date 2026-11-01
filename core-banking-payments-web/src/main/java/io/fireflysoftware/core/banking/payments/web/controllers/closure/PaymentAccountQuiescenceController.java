@@ -16,7 +16,7 @@
 
 package io.fireflysoftware.core.banking.payments.web.controllers.closure;
 
-import io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy;
+import io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl;
 import io.fireflysoftware.core.banking.payments.core.services.closure.*;
 import io.fireflysoftware.core.banking.payments.core.services.closure.impl.*;
 import io.fireflysoftware.core.banking.payments.interfaces.dtos.closure.PaymentAccountQuiescenceContracts.*;
@@ -62,10 +62,10 @@ public final class PaymentAccountQuiescenceController {
             @PathVariable UUID accountId,
             @RequestHeader("X-Idempotency-Key") UUID actionId,
             @RequestBody byte[] raw) {
-        if (!actionId.equals(PaymentAccountQuiescenceRules.decode(raw).actionId()))
-            throw ManagedPaymentPolicy.fail(409, "PAYMENT_CLOSURE_ACTION_HEADER_CONFLICT");
+        if (!actionId.equals(PaymentAccountQuiescenceRulesImpl.decode(raw).actionId()))
+            throw ManagedPaymentPolicyImpl.fail(409, "PAYMENT_CLOSURE_ACTION_HEADER_CONFLICT");
         return service.quiesce(tenant, accountId, raw)
-                .contextWrite(c -> ManagedPaymentPolicy.with(c, call(actor, authorization)));
+                .contextWrite(c -> ManagedPaymentPolicyImpl.with(c, call(actor, authorization)));
     }
 
     @DisableIdempotency
@@ -109,22 +109,22 @@ public final class PaymentAccountQuiescenceController {
             @PathVariable UUID accountId,
             @RequestHeader("X-Idempotency-Key") UUID actionId,
             @RequestBody byte[] raw) {
-        if (!actionId.equals(PaymentAccountQuiescenceRules.decodeRelease(raw).actionId()))
-            throw ManagedPaymentPolicy.fail(409, "PAYMENT_CLOSURE_ACTION_HEADER_CONFLICT");
+        if (!actionId.equals(PaymentAccountQuiescenceRulesImpl.decodeRelease(raw).actionId()))
+            throw ManagedPaymentPolicyImpl.fail(409, "PAYMENT_CLOSURE_ACTION_HEADER_CONFLICT");
         return service.release(tenant, accountId, raw);
     }
 
-    private static ManagedPaymentPolicy.Call call(SecurityPrincipal actor, String authorization) {
+    private static ManagedPaymentPolicyImpl.Call call(SecurityPrincipal actor, String authorization) {
         if (actor == null
                 || authorization == null
                 || !authorization.regionMatches(true, 0, "Bearer ", 0, 7)
                 || authorization.length() <= 7)
-            throw ManagedPaymentPolicy.fail(401, "TRUSTED_PAYMENT_CONTEXT_REQUIRED");
+            throw ManagedPaymentPolicyImpl.fail(401, "TRUSTED_PAYMENT_CONTEXT_REQUIRED");
         Object audiences = actor.claims().get("aud");
         if (!(audiences instanceof List<?> values)
                 || values.stream().anyMatch(value -> !(value instanceof String)))
-            throw ManagedPaymentPolicy.fail(401, "TRUSTED_PAYMENT_AUDIENCE_REQUIRED");
-        return new ManagedPaymentPolicy.Call(
+            throw ManagedPaymentPolicyImpl.fail(401, "TRUSTED_PAYMENT_AUDIENCE_REQUIRED");
+        return new ManagedPaymentPolicyImpl.Call(
                 actor,
                 authorization.substring(7),
                 values.stream()

@@ -121,7 +121,7 @@ class SdkLedgerFundsMonetaryObservationTest {
                 reverse ? id(5) : null, 1L);
     }
 
-    private static final class Scripted extends SdkLedgerFundsObservationAdapter {
+    private static final class Scripted extends SdkLedgerFundsObservationAdapterImpl {
         final Queue<String> bodies = new ArrayDeque<>();
         final AtomicInteger reads = new AtomicInteger();
         final AtomicInteger authorizations = new AtomicInteger();
@@ -135,7 +135,7 @@ class SdkLedgerFundsMonetaryObservationTest {
         Mono<LedgerFundsApi> client(String tenant, UUID source, UUID destination, Set<String> scopes) {
             return Mono.defer(() -> {
                 authorizations.incrementAndGet();
-                if (!permitted) return Mono.error(ManagedPaymentPolicy.fail(403, "CURRENT_UNIT_AUTHORITY_DENIED"));
+                if (!permitted) return Mono.error(ManagedPaymentPolicyImpl.fail(403, "CURRENT_UNIT_AUTHORITY_DENIED"));
                 var web = WebClient.builder().exchangeFunction(request -> {
                     reads.incrementAndGet();
                     return Mono.just(ClientResponse.create(HttpStatus.OK).header("Content-Type", "application/json")

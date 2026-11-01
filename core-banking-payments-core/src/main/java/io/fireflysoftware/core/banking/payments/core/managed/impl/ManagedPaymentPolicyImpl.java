@@ -27,8 +27,8 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.*;
 
-public final class ManagedPaymentPolicy {
-    private ManagedPaymentPolicy() {}
+public final class ManagedPaymentPolicyImpl {
+    private ManagedPaymentPolicyImpl() {}
 
     private static final Object CONTEXT = new Object();
 

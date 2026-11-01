@@ -18,7 +18,7 @@ package io.fireflysoftware.core.banking.payments.core.managed.impl;
 
 import io.fireflysoftware.core.banking.payments.core.managed.*;
 
-import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicy.*;
+import static io.fireflysoftware.core.banking.payments.core.managed.impl.ManagedPaymentPolicyImpl.*;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,14 +28,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-@Component
+@Component("managedPaymentDelegationAdapter")
 @ConditionalOnMissingBean(
         value = PaymentDelegationPort.class,
-        ignored = ManagedPaymentDelegationAdapter.class)
-public class ManagedPaymentDelegationAdapter implements PaymentDelegationPort {
+        ignored = ManagedPaymentDelegationAdapterImpl.class)
+public class ManagedPaymentDelegationAdapterImpl implements PaymentDelegationPort {
     private final String mode;
 
-    public ManagedPaymentDelegationAdapter(
+    public ManagedPaymentDelegationAdapterImpl(
             @Value("${managed-payments.delegation.mode:unconfigured}") String mode) {
         this.mode = mode;
     }
