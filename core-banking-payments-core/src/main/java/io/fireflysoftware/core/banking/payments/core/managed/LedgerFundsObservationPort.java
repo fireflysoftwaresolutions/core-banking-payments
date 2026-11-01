@@ -57,6 +57,45 @@ public interface LedgerFundsObservationPort {
             java.time.Instant observedAt,
             java.time.Instant expiresAt) {}
 
+    enum MonetaryKind { COMMIT, REVERSE }
+
+    record MonetaryExpectation(
+            MonetaryKind kind,
+            UUID selectedActionId,
+            UUID originalCommitActionId,
+            UUID originalCommitReceiptId,
+            String originalCommitDigest,
+            UUID originalPostingId,
+            Long minimumOwnerVersion) {}
+
+    record VerifiedMonetaryProof(
+            MonetaryKind kind,
+            UUID receiptId,
+            UUID participantActionId,
+            UUID reservationId,
+            UUID postingId,
+            UUID originalCommitReceiptId,
+            UUID originalPostingId,
+            String encoding,
+            String canonical,
+            String digest,
+            String envelopeJson) {}
+
+    record VerifiedMonetaryObservation(
+            VerifiedFundsObservation funds,
+            VerifiedMonetaryProof commit,
+            VerifiedMonetaryProof reversal) {}
+
+    default Mono<VerifiedMonetaryObservation> observeMonetary(
+            String tenant,
+            io.fireflysoftware.core.banking.payments.interfaces.dtos.managed
+                    .ManagedPaymentContracts.View intent,
+            MonetaryExpectation expected) {
+        return Mono.error(new ObservationUnavailable(
+                io.fireflysoftware.core.banking.payments.interfaces.dtos.managed
+                        .ManagedPaymentContracts.FailureCode.OBSERVATION_UNAVAILABLE));
+    }
+
     final class ObservationUnavailable extends RuntimeException {
         private final io.fireflysoftware.core.banking.payments.interfaces.dtos.managed
                         .ManagedPaymentContracts.FailureCode

@@ -50,7 +50,7 @@ class ManagedPaymentPersistenceMappingTest {
         var row = strategy.getOutboundRow(new ManagedPaymentEffectEntity(
                 new ManagedPaymentIds.EffectId("bank", UUID.randomUUID()), UUID.randomUUID(),
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "RESERVE", "PENDING", 0L, 0,
-                null, null, OffsetDateTime.parse("2026-10-24T01:00:00Z")));
+                null, null, OffsetDateTime.parse("2026-10-24T01:00:00Z"), null, null, null));
         assertThat(row.keySet().stream().map(k -> k.getReference()))
                 .contains("tenant_id", "effect_id", "fence", "attempts").doesNotContain("next_attempt_at");
     }

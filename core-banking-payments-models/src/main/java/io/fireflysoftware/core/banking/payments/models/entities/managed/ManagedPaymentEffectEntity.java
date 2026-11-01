@@ -21,4 +21,7 @@ public record ManagedPaymentEffectEntity(
         Integer attempts,
         String ownerSubject,
         OffsetDateTime leaseUntil,
-        @ReadOnlyProperty OffsetDateTime nextAttemptAt) {}
+        @ReadOnlyProperty OffsetDateTime nextAttemptAt,
+        UUID originalEffectId,
+        Long originalCommitVersion,
+        UUID originalReservationId) {}

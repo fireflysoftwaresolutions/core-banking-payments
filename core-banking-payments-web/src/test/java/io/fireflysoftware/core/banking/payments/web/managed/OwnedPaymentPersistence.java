@@ -5,6 +5,7 @@ import io.fireflysoftware.core.banking.payments.core.managed.impl.*;
 import io.fireflysoftware.core.banking.payments.core.services.closure.impl.*;
 import io.fireflysoftware.core.banking.payments.models.configuration.ManagedPaymentPersistenceConfiguration;
 import io.fireflysoftware.core.banking.payments.models.repositories.managed.*;
+import io.fireflysoftware.core.banking.payments.models.repositories.managed.impl.ManagedPaymentJournalOperationsImpl;
 import io.fireflysoftware.core.banking.payments.models.repositories.closure.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.r2dbc.core.*;
@@ -13,7 +14,6 @@ import org.springframework.data.r2dbc.repository.support.R2dbcRepositoryFactory;
 import org.springframework.data.repository.core.support.RepositoryComposition.RepositoryFragments;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.transaction.ReactiveTransactionManager;
-import io.fireflysoftware.core.banking.payments.models.repositories.managed.impl.ManagedPaymentJournalOperationsImpl;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +37,8 @@ public final class OwnedPaymentPersistence implements AutoCloseable {
         return new ManagedPaymentStore(repositories.getRepository(ManagedPaymentOperationRepository.class),
                 repositories.getRepository(ManagedPaymentActionRepository.class),
                 repositories.getRepository(ManagedPaymentEffectRepository.class),
-                repositories.getRepository(ManagedPaymentHistoryRepository.class), journal,
+                repositories.getRepository(ManagedPaymentHistoryRepository.class),
+                repositories.getRepository(ManagedPaymentMonetaryProofRepository.class), journal,
                 repositories.getRepository(ManagedPaymentNativeRepository.class));
     }
 

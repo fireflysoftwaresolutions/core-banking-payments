@@ -41,7 +41,7 @@ class ManagedPaymentEffectRescheduleTest {
     });
     private final ManagedPaymentStore store = new ManagedPaymentStore(mock(ManagedPaymentOperationRepository.class),
             mock(ManagedPaymentActionRepository.class), mock(ManagedPaymentEffectRepository.class),
-            mock(ManagedPaymentHistoryRepository.class), journal, nativeRepository);
+            mock(ManagedPaymentHistoryRepository.class), mock(ManagedPaymentMonetaryProofRepository.class), journal, nativeRepository);
     private final UUID effectId = UUID.fromString("00000000-0000-0000-0000-000000000041");
 
     private EffectRow effect(int attempts) {

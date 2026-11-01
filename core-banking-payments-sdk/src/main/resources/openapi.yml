@@ -1,10 +1,16 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
-  title: OpenAPI definition
-  version: v0
+  title: core-baking-payments
+  description: Payments Core Application
+  contact:
+    name: Firefly Software Foundation
+    email: dev@fireflysoftware.io
+  version: 1.0.0
 servers:
-- url: http://localhost:18080
-  description: Generated server url
+- url: https://openplatform.fireflysoftware.io/payments
+  description: Development Environment
+- url: /
+  description: Local Development Environment
 tags:
 - name: Payment Compliance
   description: APIs for managing payment compliance information
@@ -2053,55 +2059,300 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.scheduledDate
+        in: query
+        description: Exact filter for scheduled date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[scheduledDate].from"
+        in: query
+        description: Filter scheduled date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[scheduledDate].to"
+        in: query
+        description: Filter scheduled date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.amount
+        in: query
+        description: Exact filter for amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[amount].from"
+        in: query
+        description: Filter amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[amount].to"
+        in: query
+        description: Filter amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.frequency
+        in: query
+        description: Exact filter for frequency
+        required: false
+        schema:
+          type: string
+          enum:
+          - ONE_TIME
+          - DAILY
+          - WEEKLY
+          - MONTHLY
+          - YEARLY
+      - name: filters.scheduleStatus
+        in: query
+        description: Exact filter for schedule status
+        required: false
+        schema:
+          type: string
+          enum:
+          - SCHEDULED
+          - COMPLETED
+          - CANCELLED
+      - name: filters.endDate
+        in: query
+        description: Exact filter for end date
+        required: false
+        schema:
+          type: string
+      - name: filters.maxExecutions
+        in: query
+        description: Exact filter for max executions
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[maxExecutions].from"
+        in: query
+        description: Filter max executions from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[maxExecutions].to"
+        in: query
+        description: Filter max executions to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.currentExecutionCount
+        in: query
+        description: Exact filter for current execution count
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[currentExecutionCount].from"
+        in: query
+        description: Filter current execution count from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[currentExecutionCount].to"
+        in: query
+        description: Filter current execution count to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.nextExecutionDate
+        in: query
+        description: Exact filter for next execution date
+        required: false
+        schema:
+          type: string
+      - name: filters.dayOfMonth
+        in: query
+        description: Exact filter for day of month
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[dayOfMonth].from"
+        in: query
+        description: Filter day of month from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[dayOfMonth].to"
+        in: query
+        description: Filter day of month to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.dayOfWeek
+        in: query
+        description: Exact filter for day of week
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[dayOfWeek].from"
+        in: query
+        description: Filter day of week from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[dayOfWeek].to"
+        in: query
+        description: Filter day of week to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.weekOfMonth
+        in: query
+        description: Exact filter for week of month
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[weekOfMonth].from"
+        in: query
+        description: Filter week of month from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[weekOfMonth].to"
+        in: query
+        description: Filter week of month to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.monthOfYear
+        in: query
+        description: Exact filter for month of year
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[monthOfYear].from"
+        in: query
+        description: Filter month of year from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[monthOfYear].to"
+        in: query
+        description: Filter month of year to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.scheduleNotes
+        in: query
+        description: Exact filter for schedule notes
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -2175,55 +2426,178 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.providerName
+        in: query
+        description: Exact filter for provider name
+        required: false
+        schema:
+          type: string
+      - name: filters.externalReference
+        in: query
+        description: Exact filter for external reference
+        required: false
+        schema:
+          type: string
+      - name: filters.status
+        in: query
+        description: Exact filter for status
+        required: false
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - PENDING
+          - SUSPENDED
+      - name: filters.providerType
+        in: query
+        description: Exact filter for provider type
+        required: false
+        schema:
+          type: string
+      - name: filters.providerUrl
+        in: query
+        description: Exact filter for provider url
+        required: false
+        schema:
+          type: string
+      - name: filters.providerApiKey
+        in: query
+        description: Exact filter for provider api key
+        required: false
+        schema:
+          type: string
+      - name: filters.providerUsername
+        in: query
+        description: Exact filter for provider username
+        required: false
+        schema:
+          type: string
+      - name: filters.providerFee
+        in: query
+        description: Exact filter for provider fee
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[providerFee].from"
+        in: query
+        description: Filter provider fee from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[providerFee].to"
+        in: query
+        description: Filter provider fee to value
+        required: false
+        schema:
+          type: string
+      - name: filters.providerFeeCurrencyCode
+        in: query
+        description: Exact filter for provider fee currency code
+        required: false
+        schema:
+          type: string
+      - name: filters.providerResponseCode
+        in: query
+        description: Exact filter for provider response code
+        required: false
+        schema:
+          type: string
+      - name: filters.providerResponseMessage
+        in: query
+        description: Exact filter for provider response message
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -2297,55 +2671,128 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.documentId
+        in: query
+        description: Exact filter for document id
+        required: false
+        schema:
+          type: string
+      - name: filters.proofType
+        in: query
+        description: Exact filter for proof type
+        required: false
+        schema:
+          type: string
+      - name: filters.proofDate
+        in: query
+        description: Exact filter for proof date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[proofDate].from"
+        in: query
+        description: Filter proof date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[proofDate].to"
+        in: query
+        description: Filter proof date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -2419,55 +2866,150 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.payrollReference
+        in: query
+        description: Exact filter for payroll reference
+        required: false
+        schema:
+          type: string
+      - name: filters.payrollDate
+        in: query
+        description: Exact filter for payroll date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[payrollDate].from"
+        in: query
+        description: Filter payroll date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[payrollDate].to"
+        in: query
+        description: Filter payroll date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.totalAmount
+        in: query
+        description: Exact filter for total amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[totalAmount].from"
+        in: query
+        description: Filter total amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[totalAmount].to"
+        in: query
+        description: Filter total amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.payrollStatus
+        in: query
+        description: Exact filter for payroll status
+        required: false
+        schema:
+          type: string
+          enum:
+          - INITIATED
+          - PROCESSED
+          - FAILED
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -2541,55 +3083,211 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.instructionType
+        in: query
+        description: Exact filter for instruction type
+        required: false
+        schema:
+          type: string
+          enum:
+          - IMMEDIATE
+          - SCHEDULED
+      - name: filters.instructionDate
+        in: query
+        description: Exact filter for instruction date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[instructionDate].from"
+        in: query
+        description: Filter instruction date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[instructionDate].to"
+        in: query
+        description: Filter instruction date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.instructionStatus
+        in: query
+        description: Exact filter for instruction status
+        required: false
+        schema:
+          type: string
+          enum:
+          - INITIATED
+          - COMPLETED
+          - FAILED
+      - name: filters.externalReference
+        in: query
+        description: Exact filter for external reference
+        required: false
+        schema:
+          type: string
+      - name: filters.instructionPriority
+        in: query
+        description: Exact filter for instruction priority
+        required: false
+        schema:
+          type: string
+          enum:
+          - NORMAL
+          - HIGH
+          - URGENT
+      - name: filters.instructionNotes
+        in: query
+        description: Exact filter for instruction notes
+        required: false
+        schema:
+          type: string
+      - name: filters.retryCount
+        in: query
+        description: Exact filter for retry count
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[retryCount].from"
+        in: query
+        description: Filter retry count from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[retryCount].to"
+        in: query
+        description: Filter retry count to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.lastRetryDate
+        in: query
+        description: Exact filter for last retry date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[lastRetryDate].from"
+        in: query
+        description: Filter last retry date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[lastRetryDate].to"
+        in: query
+        description: Filter last retry date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.errorCode
+        in: query
+        description: Exact filter for error code
+        required: false
+        schema:
+          type: string
+      - name: filters.errorDescription
+        in: query
+        description: Exact filter for error description
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -2663,55 +3361,216 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.feeType
+        in: query
+        description: Exact filter for fee type
+        required: false
+        schema:
+          type: string
+      - name: filters.feeTypeEnum
+        in: query
+        description: Exact filter for fee type enum
+        required: false
+        schema:
+          type: string
+          enum:
+          - TRANSACTION_FEE
+          - PROCESSING_FEE
+          - CURRENCY_CONVERSION_FEE
+          - INTERNATIONAL_TRANSFER_FEE
+          - URGENT_PROCESSING_FEE
+          - CORRESPONDENT_BANK_FEE
+      - name: filters.feeAmount
+        in: query
+        description: Exact filter for fee amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeAmount].from"
+        in: query
+        description: Filter fee amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeAmount].to"
+        in: query
+        description: Filter fee amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.feeCurrencyCode
+        in: query
+        description: Exact filter for fee currency code
+        required: false
+        schema:
+          type: string
+      - name: filters.feeDescription
+        in: query
+        description: Exact filter for fee description
+        required: false
+        schema:
+          type: string
+      - name: filters.feeCalculationMethod
+        in: query
+        description: Exact filter for fee calculation method
+        required: false
+        schema:
+          type: string
+      - name: filters.feeRate
+        in: query
+        description: Exact filter for fee rate
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeRate].from"
+        in: query
+        description: Filter fee rate from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeRate].to"
+        in: query
+        description: Filter fee rate to value
+        required: false
+        schema:
+          type: string
+      - name: filters.feeTaxAmount
+        in: query
+        description: Exact filter for fee tax amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeTaxAmount].from"
+        in: query
+        description: Filter fee tax amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeTaxAmount].to"
+        in: query
+        description: Filter fee tax amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.feeTaxRate
+        in: query
+        description: Exact filter for fee tax rate
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeTaxRate].from"
+        in: query
+        description: Filter fee tax rate from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[feeTaxRate].to"
+        in: query
+        description: Filter fee tax rate to value
+        required: false
+        schema:
+          type: string
+      - name: filters.feeTaxType
+        in: query
+        description: Exact filter for fee tax type
+        required: false
+        schema:
+          type: string
+      - name: filters.feeWaived
+        in: query
+        description: Exact filter for fee waived
+        required: false
+        schema:
+          type: boolean
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -2785,55 +3644,212 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.sourceCurrency
+        in: query
+        description: Exact filter for source currency
+        required: false
+        schema:
+          type: string
+      - name: filters.targetCurrency
+        in: query
+        description: Exact filter for target currency
+        required: false
+        schema:
+          type: string
+      - name: filters.rate
+        in: query
+        description: Exact filter for rate
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[rate].from"
+        in: query
+        description: Filter rate from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[rate].to"
+        in: query
+        description: Filter rate to value
+        required: false
+        schema:
+          type: string
+      - name: filters.rateDate
+        in: query
+        description: Exact filter for rate date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[rateDate].from"
+        in: query
+        description: Filter rate date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[rateDate].to"
+        in: query
+        description: Filter rate date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.rateProvider
+        in: query
+        description: Exact filter for rate provider
+        required: false
+        schema:
+          type: string
+      - name: filters.rateType
+        in: query
+        description: Exact filter for rate type
+        required: false
+        schema:
+          type: string
+      - name: filters.markupPercentage
+        in: query
+        description: Exact filter for markup percentage
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[markupPercentage].from"
+        in: query
+        description: Filter markup percentage from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[markupPercentage].to"
+        in: query
+        description: Filter markup percentage to value
+        required: false
+        schema:
+          type: string
+      - name: filters.originalAmount
+        in: query
+        description: Exact filter for original amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[originalAmount].from"
+        in: query
+        description: Filter original amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[originalAmount].to"
+        in: query
+        description: Filter original amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.convertedAmount
+        in: query
+        description: Exact filter for converted amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[convertedAmount].from"
+        in: query
+        description: Filter converted amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[convertedAmount].to"
+        in: query
+        description: Filter converted amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -2908,55 +3924,152 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondenceType
+        in: query
+        description: Exact filter for correspondence type
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondenceDate
+        in: query
+        description: Exact filter for correspondence date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[correspondenceDate].from"
+        in: query
+        description: Filter correspondence date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[correspondenceDate].to"
+        in: query
+        description: Filter correspondence date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.correspondenceChannel
+        in: query
+        description: Exact filter for correspondence channel
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondenceDirection
+        in: query
+        description: Exact filter for correspondence direction
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondentBank
+        in: query
+        description: Exact filter for correspondent bank
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondentReference
+        in: query
+        description: Exact filter for correspondent reference
+        required: false
+        schema:
+          type: string
+      - name: filters.messageContent
+        in: query
+        description: Exact filter for message content
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -3030,55 +4143,218 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.screeningStatus
+        in: query
+        description: Exact filter for screening status
+        required: false
+        schema:
+          type: string
+      - name: filters.screeningDate
+        in: query
+        description: Exact filter for screening date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[screeningDate].from"
+        in: query
+        description: Filter screening date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[screeningDate].to"
+        in: query
+        description: Filter screening date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.screeningReference
+        in: query
+        description: Exact filter for screening reference
+        required: false
+        schema:
+          type: string
+      - name: filters.riskScore
+        in: query
+        description: Exact filter for risk score
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[riskScore].from"
+        in: query
+        description: Filter risk score from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[riskScore].to"
+        in: query
+        description: Filter risk score to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.riskLevel
+        in: query
+        description: Exact filter for risk level
+        required: false
+        schema:
+          type: string
+      - name: filters.complianceNotes
+        in: query
+        description: Exact filter for compliance notes
+        required: false
+        schema:
+          type: string
+      - name: filters.amlCheckStatus
+        in: query
+        description: Exact filter for aml check status
+        required: false
+        schema:
+          type: string
+      - name: filters.sanctionsCheckStatus
+        in: query
+        description: Exact filter for sanctions check status
+        required: false
+        schema:
+          type: string
+      - name: filters.pepCheckStatus
+        in: query
+        description: Exact filter for pep check status
+        required: false
+        schema:
+          type: string
+      - name: filters.kycCheckStatus
+        in: query
+        description: Exact filter for kyc check status
+        required: false
+        schema:
+          type: string
+      - name: filters.approvedBy
+        in: query
+        description: Exact filter for approved by
+        required: false
+        schema:
+          type: string
+      - name: filters.approvalDate
+        in: query
+        description: Exact filter for approval date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[approvalDate].from"
+        in: query
+        description: Filter approval date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[approvalDate].to"
+        in: query
+        description: Filter approval date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.rejectionReason
+        in: query
+        description: Exact filter for rejection reason
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -3146,55 +4422,384 @@ paths:
       parameters:
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.payerAccountId
+        in: query
+        description: Exact filter for payer account id
+        required: false
+        schema:
+          type: string
+      - name: filters.paymentMethodId
+        in: query
+        description: Exact filter for payment method id
+        required: false
+        schema:
+          type: string
+      - name: filters.paymentBeneficiaryId
+        in: query
+        description: Exact filter for payment beneficiary id
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryName
+        in: query
+        description: Exact filter for beneficiary name
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryAccountNumber
+        in: query
+        description: Exact filter for beneficiary account number
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryIban
+        in: query
+        description: Exact filter for beneficiary iban
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryBic
+        in: query
+        description: Exact filter for beneficiary bic
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryAddress
+        in: query
+        description: Exact filter for beneficiary address
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryCountryCode
+        in: query
+        description: Exact filter for beneficiary country code
+        required: false
+        schema:
+          type: string
+      - name: filters.abaRoutingNumber
+        in: query
+        description: Exact filter for aba routing number
+        required: false
+        schema:
+          type: string
+      - name: filters.paymentType
+        in: query
+        description: Exact filter for payment type
+        required: false
+        schema:
+          type: string
+          enum:
+          - SEPA_SCT
+          - SEPA_ICT
+          - SEPA_DIRECT_DEBIT
+          - INTERNAL
+          - SWIFT
+          - PAYROLL
+      - name: filters.orderDate
+        in: query
+        description: Exact filter for order date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[orderDate].from"
+        in: query
+        description: Filter order date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[orderDate].to"
+        in: query
+        description: Filter order date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.status
+        in: query
+        description: Exact filter for status
+        required: false
+        schema:
+          type: string
+          enum:
+          - INITIATED
+          - COMPLETED
+          - FAILED
+      - name: filters.amount
+        in: query
+        description: Exact filter for amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[amount].from"
+        in: query
+        description: Filter amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[amount].to"
+        in: query
+        description: Filter amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.currencyCode
+        in: query
+        description: Exact filter for currency code
+        required: false
+        schema:
+          type: string
+      - name: filters.swiftBicCode
+        in: query
+        description: Exact filter for swift bic code
+        required: false
+        schema:
+          type: string
+      - name: filters.remittanceInformation
+        in: query
+        description: Exact filter for remittance information
+        required: false
+        schema:
+          type: string
+      - name: filters.referenceNumber
+        in: query
+        description: Exact filter for reference number
+        required: false
+        schema:
+          type: string
+      - name: filters.priority
+        in: query
+        description: Exact filter for priority
+        required: false
+        schema:
+          type: string
+          enum:
+          - NORMAL
+          - HIGH
+          - URGENT
+      - name: filters.purpose
+        in: query
+        description: Exact filter for purpose
+        required: false
+        schema:
+          type: string
+          enum:
+          - INVOICE_PAYMENT
+          - SALARY_PAYMENT
+          - SUPPLIER_PAYMENT
+          - TAX_PAYMENT
+          - UTILITY_PAYMENT
+          - LOAN_PAYMENT
+          - INVESTMENT
+          - DONATION
+          - OTHER
+      - name: filters.purposeCode
+        in: query
+        description: Exact filter for purpose code
+        required: false
+        schema:
+          type: string
+      - name: filters.channel
+        in: query
+        description: Exact filter for channel
+        required: false
+        schema:
+          type: string
+          enum:
+          - ONLINE_BANKING
+          - MOBILE_APP
+          - BRANCH
+          - ATM
+          - API
+          - BATCH
+      - name: filters.category
+        in: query
+        description: Exact filter for category
+        required: false
+        schema:
+          type: string
+          enum:
+          - DOMESTIC
+          - INTERNATIONAL
+          - INTERNAL
+      - name: filters.exchangeRate
+        in: query
+        description: Exact filter for exchange rate
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[exchangeRate].from"
+        in: query
+        description: Filter exchange rate from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[exchangeRate].to"
+        in: query
+        description: Filter exchange rate to value
+        required: false
+        schema:
+          type: string
+      - name: filters.chargeBearer
+        in: query
+        description: Exact filter for charge bearer
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryType
+        in: query
+        description: Exact filter for beneficiary type
+        required: false
+        schema:
+          type: string
+          enum:
+          - INDIVIDUAL
+          - BUSINESS
+          - GOVERNMENT
+      - name: filters.beneficiaryBankName
+        in: query
+        description: Exact filter for beneficiary bank name
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryBankAddress
+        in: query
+        description: Exact filter for beneficiary bank address
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryBankCountryCode
+        in: query
+        description: Exact filter for beneficiary bank country code
+        required: false
+        schema:
+          type: string
+      - name: filters.intermediaryBankName
+        in: query
+        description: Exact filter for intermediary bank name
+        required: false
+        schema:
+          type: string
+      - name: filters.intermediaryBankBic
+        in: query
+        description: Exact filter for intermediary bank bic
+        required: false
+        schema:
+          type: string
+      - name: filters.intermediaryBankAccount
+        in: query
+        description: Exact filter for intermediary bank account
+        required: false
+        schema:
+          type: string
+      - name: filters.regulatoryReporting
+        in: query
+        description: Exact filter for regulatory reporting
+        required: false
+        schema:
+          type: string
+      - name: filters.taxInformation
+        in: query
+        description: Exact filter for tax information
+        required: false
+        schema:
+          type: string
+      - name: filters.valueDate
+        in: query
+        description: Exact filter for value date
+        required: false
+        schema:
+          type: string
+      - name: filters.requestedExecutionDate
+        in: query
+        description: Exact filter for requested execution date
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -3254,55 +4859,199 @@ paths:
       parameters:
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.methodName
+        in: query
+        description: Exact filter for method name
+        required: false
+        schema:
+          type: string
+      - name: filters.description
+        in: query
+        description: Exact filter for description
+        required: false
+        schema:
+          type: string
+      - name: filters.activeFlag
+        in: query
+        description: Exact filter for active flag
+        required: false
+        schema:
+          type: boolean
+      - name: filters.processingTimeHours
+        in: query
+        description: Exact filter for processing time hours
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[processingTimeHours].from"
+        in: query
+        description: Filter processing time hours from value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: "rangeFilters.ranges[processingTimeHours].to"
+        in: query
+        description: Filter processing time hours to value
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filters.minAmount
+        in: query
+        description: Exact filter for min amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[minAmount].from"
+        in: query
+        description: Filter min amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[minAmount].to"
+        in: query
+        description: Filter min amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.maxAmount
+        in: query
+        description: Exact filter for max amount
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[maxAmount].from"
+        in: query
+        description: Filter max amount from value
+        required: false
+        schema:
+          type: string
+      - name: "rangeFilters.ranges[maxAmount].to"
+        in: query
+        description: Filter max amount to value
+        required: false
+        schema:
+          type: string
+      - name: filters.supportedCurrencies
+        in: query
+        description: Exact filter for supported currencies
+        required: false
+        schema:
+          type: string
+          description: Comma-separated values for collection/array filtering
+      - name: filters.requiresIntermediaryBank
+        in: query
+        description: Exact filter for requires intermediary bank
+        required: false
+        schema:
+          type: boolean
+      - name: filters.requiresRegulatoryReporting
+        in: query
+        description: Exact filter for requires regulatory reporting
+        required: false
+        schema:
+          type: boolean
+      - name: filters.requiresPurposeCode
+        in: query
+        description: Exact filter for requires purpose code
+        required: false
+        schema:
+          type: boolean
+      - name: filters.defaultPriority
+        in: query
+        description: Exact filter for default priority
+        required: false
+        schema:
+          type: string
+          enum:
+          - NORMAL
+          - HIGH
+          - URGENT
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -3359,70 +5108,197 @@ paths:
       description: Retrieves a paginated list of beneficiaries with optional filtering.
       operationId: getAllBeneficiaries
       parameters:
-      - name: payerAccountId
-        in: query
-        description: Payer Account ID
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: isFavorite
-        in: query
-        description: Is Favorite
-        required: false
-        schema:
-          type: boolean
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.payerAccountId
+        in: query
+        description: Exact filter for payer account id
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryName
+        in: query
+        description: Exact filter for beneficiary name
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryType
+        in: query
+        description: Exact filter for beneficiary type
+        required: false
+        schema:
+          type: string
+          enum:
+          - INDIVIDUAL
+          - BUSINESS
+          - GOVERNMENT
+      - name: filters.beneficiaryAccountNumber
+        in: query
+        description: Exact filter for beneficiary account number
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryIban
+        in: query
+        description: Exact filter for beneficiary iban
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryBic
+        in: query
+        description: Exact filter for beneficiary bic
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryAddress
+        in: query
+        description: Exact filter for beneficiary address
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryCity
+        in: query
+        description: Exact filter for beneficiary city
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryPostalCode
+        in: query
+        description: Exact filter for beneficiary postal code
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryCountryCode
+        in: query
+        description: Exact filter for beneficiary country code
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryEmail
+        in: query
+        description: Exact filter for beneficiary email
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryPhone
+        in: query
+        description: Exact filter for beneficiary phone
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryBankName
+        in: query
+        description: Exact filter for beneficiary bank name
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryBankAddress
+        in: query
+        description: Exact filter for beneficiary bank address
+        required: false
+        schema:
+          type: string
+      - name: filters.beneficiaryBankCountryCode
+        in: query
+        description: Exact filter for beneficiary bank country code
+        required: false
+        schema:
+          type: string
+      - name: filters.isFavorite
+        in: query
+        description: Exact filter for is favorite
+        required: false
+        schema:
+          type: boolean
+      - name: filters.nickname
+        in: query
+        description: Exact filter for nickname
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -3908,55 +5784,164 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.paymentInstructionId
+        in: query
+        description: Exact filter for payment instruction id
+        required: false
+        schema:
+          type: string
+      - name: filters.action
+        in: query
+        description: Exact filter for action
+        required: false
+        schema:
+          type: string
+      - name: filters.actionDate
+        in: query
+        description: Exact filter for action date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[actionDate].from"
+        in: query
+        description: Filter action date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[actionDate].to"
+        in: query
+        description: Filter action date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.actionBy
+        in: query
+        description: Exact filter for action by
+        required: false
+        schema:
+          type: string
+      - name: filters.previousStatus
+        in: query
+        description: Exact filter for previous status
+        required: false
+        schema:
+          type: string
+      - name: filters.newStatus
+        in: query
+        description: Exact filter for new status
+        required: false
+        schema:
+          type: string
+      - name: filters.ipAddress
+        in: query
+        description: Exact filter for ip address
+        required: false
+        schema:
+          type: string
+      - name: filters.userAgent
+        in: query
+        description: Exact filter for user agent
+        required: false
+        schema:
+          type: string
+      - name: filters.additionalInfo
+        in: query
+        description: Exact filter for additional info
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -3999,55 +5984,152 @@ paths:
           type: string
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondenceType
+        in: query
+        description: Exact filter for correspondence type
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondenceDate
+        in: query
+        description: Exact filter for correspondence date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[correspondenceDate].from"
+        in: query
+        description: Filter correspondence date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[correspondenceDate].to"
+        in: query
+        description: Filter correspondence date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.correspondenceChannel
+        in: query
+        description: Exact filter for correspondence channel
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondenceDirection
+        in: query
+        description: Exact filter for correspondence direction
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondentBank
+        in: query
+        description: Exact filter for correspondent bank
+        required: false
+        schema:
+          type: string
+      - name: filters.correspondentReference
+        in: query
+        description: Exact filter for correspondent reference
+        required: false
+        schema:
+          type: string
+      - name: filters.messageContent
+        in: query
+        description: Exact filter for message content
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -4084,55 +6166,164 @@ paths:
           format: uuid
       - name: pagination.pageNumber
         in: query
-        description: The zero-based page number to retrieve.
+        description: Page number (0-based)
         required: false
         schema:
           type: integer
-          description: The zero-based page number to retrieve.
           format: int32
-          example: 0
           default: 0
-        example: 0
       - name: pagination.pageSize
         in: query
-        description: The number of items per page.
+        description: Number of items per page
         required: false
         schema:
           type: integer
-          description: The number of items per page.
           format: int32
-          example: 10
           default: 10
-        example: 10
       - name: pagination.sortBy
         in: query
-        description: The field to sort the results by.
+        description: Field to sort by
         required: false
         schema:
           type: string
-          description: The field to sort the results by.
-          example: name
-        example: name
       - name: pagination.sortDirection
         in: query
-        description: "The direction of sorting, either ASC or DESC."
+        description: Sort direction (ASC or DESC)
         required: false
         schema:
           type: string
-          description: "The direction of sorting, either ASC or DESC."
-          example: DESC
           default: DESC
-        example: DESC
       - name: options.caseInsensitiveStrings
         in: query
+        description: Enable case-insensitive string filtering
         required: false
         schema:
           type: boolean
+          default: false
       - name: options.includeInheritedFields
         in: query
+        description: Include fields from parent classes
         required: false
         schema:
           type: boolean
+          default: false
+      - name: filters.paymentOrderId
+        in: query
+        description: Exact filter for payment order id
+        required: false
+        schema:
+          type: string
+      - name: filters.paymentInstructionId
+        in: query
+        description: Exact filter for payment instruction id
+        required: false
+        schema:
+          type: string
+      - name: filters.action
+        in: query
+        description: Exact filter for action
+        required: false
+        schema:
+          type: string
+      - name: filters.actionDate
+        in: query
+        description: Exact filter for action date
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[actionDate].from"
+        in: query
+        description: Filter action date from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[actionDate].to"
+        in: query
+        description: Filter action date to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.actionBy
+        in: query
+        description: Exact filter for action by
+        required: false
+        schema:
+          type: string
+      - name: filters.previousStatus
+        in: query
+        description: Exact filter for previous status
+        required: false
+        schema:
+          type: string
+      - name: filters.newStatus
+        in: query
+        description: Exact filter for new status
+        required: false
+        schema:
+          type: string
+      - name: filters.ipAddress
+        in: query
+        description: Exact filter for ip address
+        required: false
+        schema:
+          type: string
+      - name: filters.userAgent
+        in: query
+        description: Exact filter for user agent
+        required: false
+        schema:
+          type: string
+      - name: filters.additionalInfo
+        in: query
+        description: Exact filter for additional info
+        required: false
+        schema:
+          type: string
+      - name: filters.dateCreated
+        in: query
+        description: Exact filter for date created
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].from"
+        in: query
+        description: Filter date created from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateCreated].to"
+        in: query
+        description: Filter date created to value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: filters.dateUpdated
+        in: query
+        description: Exact filter for date updated
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].from"
+        in: query
+        description: Filter date updated from value
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: "rangeFilters.ranges[dateUpdated].to"
+        in: query
+        description: Filter date updated to value
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: X-Idempotency-Key
         in: header
         description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
@@ -4275,12 +6466,6 @@ paths:
 components:
   schemas:
     PaymentScheduleDTO:
-      required:
-      - amount
-      - frequency
-      - paymentOrderId
-      - scheduleStatus
-      - scheduledDate
       type: object
       properties:
         dateCreated:
@@ -4302,9 +6487,8 @@ components:
           type: string
           format: date-time
         amount:
-          minimum: 0.01
-          exclusiveMinimum: false
           type: number
+          minimum: 0.01
         frequency:
           type: string
           enum:
@@ -4323,47 +6507,48 @@ components:
           type: string
           format: date
         maxExecutions:
+          type: integer
+          format: int32
           maximum: 9999
           minimum: 1
-          type: integer
-          format: int32
         currentExecutionCount:
-          minimum: 0
           type: integer
           format: int32
+          minimum: 0
         nextExecutionDate:
           type: string
           format: date
         dayOfMonth:
+          type: integer
+          format: int32
           maximum: 31
           minimum: 1
+        dayOfWeek:
           type: integer
           format: int32
-        dayOfWeek:
           maximum: 7
           minimum: 1
+        weekOfMonth:
           type: integer
           format: int32
-        weekOfMonth:
           maximum: 5
           minimum: 1
+        monthOfYear:
           type: integer
           format: int32
-        monthOfYear:
           maximum: 12
           minimum: 1
-          type: integer
-          format: int32
         scheduleNotes:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
-    PaymentProviderDTO:
       required:
+      - amount
+      - frequency
       - paymentOrderId
-      - providerName
-      - providerType
-      - status
+      - scheduleStatus
+      - scheduledDate
+    PaymentProviderDTO:
       type: object
       properties:
         dateCreated:
@@ -4382,13 +6567,13 @@ components:
           type: string
           format: uuid
         providerName:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         externalReference:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         status:
           type: string
           enum:
@@ -4397,51 +6582,50 @@ components:
           - PENDING
           - SUSPENDED
         providerType:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         providerUrl:
+          type: string
           maxLength: 500
           minLength: 0
           pattern: ^https?://.*
-          type: string
         providerApiKey:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         providerUsername:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         providerAccountId:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         providerFee:
-          minimum: 0.00
-          exclusiveMinimum: false
           type: number
+          minimum: 0.00
         providerFeeCurrencyCode:
-          pattern: "^[A-Z]{3}$"
           type: string
+          pattern: "^[A-Z]{3}$"
         providerResponseCode:
+          type: string
           maxLength: 20
           minLength: 0
-          type: string
         providerResponseMessage:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         providerTransactionId:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
-    PaymentProofDTO:
       required:
-      - documentId
       - paymentOrderId
-      - proofDate
-      - proofType
+      - providerName
+      - providerType
+      - status
+    PaymentProofDTO:
       type: object
       properties:
         dateCreated:
@@ -4463,19 +6647,18 @@ components:
           type: string
           format: uuid
         proofType:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         proofDate:
           type: string
           format: date-time
-    PayrollOrderDTO:
       required:
+      - documentId
       - paymentOrderId
-      - payrollDate
-      - payrollReference
-      - payrollStatus
-      - totalAmount
+      - proofDate
+      - proofType
+    PayrollOrderDTO:
       type: object
       properties:
         dateCreated:
@@ -4494,29 +6677,28 @@ components:
           type: string
           format: uuid
         payrollReference:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         payrollDate:
           type: string
           format: date-time
         totalAmount:
-          minimum: 0.01
-          exclusiveMinimum: false
           type: number
+          minimum: 0.01
         payrollStatus:
           type: string
           enum:
           - INITIATED
           - PROCESSED
           - FAILED
-    PaymentInstructionDTO:
       required:
-      - instructionDate
-      - instructionId
-      - instructionStatus
-      - instructionType
       - paymentOrderId
+      - payrollDate
+      - payrollReference
+      - payrollStatus
+      - totalAmount
+    PaymentInstructionDTO:
       type: object
       properties:
         dateCreated:
@@ -4535,9 +6717,9 @@ components:
           type: string
           format: uuid
         instructionId:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         instructionType:
           type: string
           enum:
@@ -4553,9 +6735,9 @@ components:
           - COMPLETED
           - FAILED
         externalReference:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         instructionPriority:
           type: string
           enum:
@@ -4563,32 +6745,32 @@ components:
           - HIGH
           - URGENT
         instructionNotes:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         retryCount:
-          maximum: 10
-          minimum: 0
           type: integer
           format: int32
+          maximum: 10
+          minimum: 0
         lastRetryDate:
           type: string
           format: date-time
         errorCode:
+          type: string
           maxLength: 20
           minLength: 0
-          type: string
         errorDescription:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
-    PaymentFeeDTO:
       required:
-      - feeAmount
-      - feeCurrencyCode
-      - feeTypeEnum
-      - feeWaived
+      - instructionDate
+      - instructionId
+      - instructionStatus
+      - instructionType
       - paymentOrderId
+    PaymentFeeDTO:
       type: object
       properties:
         dateCreated:
@@ -4607,9 +6789,9 @@ components:
           type: string
           format: uuid
         feeType:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         feeTypeEnum:
           type: string
           enum:
@@ -4620,54 +6802,44 @@ components:
           - URGENT_PROCESSING_FEE
           - CORRESPONDENT_BANK_FEE
         feeAmount:
-          minimum: 0.00
-          exclusiveMinimum: false
           type: number
+          minimum: 0.00
         feeCurrencyCode:
+          type: string
           minLength: 1
           pattern: "^[A-Z]{3}$"
-          type: string
         feeDescription:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         feeCalculationMethod:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         feeRate:
-          maximum: 100.00
-          exclusiveMaximum: false
-          minimum: 0.00
-          exclusiveMinimum: false
           type: number
+          maximum: 100.00
+          minimum: 0.00
         feeTaxAmount:
-          minimum: 0.00
-          exclusiveMinimum: false
           type: number
+          minimum: 0.00
         feeTaxRate:
-          maximum: 100.00
-          exclusiveMaximum: false
-          minimum: 0.00
-          exclusiveMinimum: false
           type: number
+          maximum: 100.00
+          minimum: 0.00
         feeTaxType:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         feeWaived:
           type: boolean
-    PaymentExchangeRateDTO:
       required:
-      - convertedAmount
-      - originalAmount
+      - feeAmount
+      - feeCurrencyCode
+      - feeTypeEnum
+      - feeWaived
       - paymentOrderId
-      - rate
-      - rateDate
-      - rateProvider
-      - rateType
-      - sourceCurrency
-      - targetCurrency
+    PaymentExchangeRateDTO:
       type: object
       properties:
         dateCreated:
@@ -4686,50 +6858,48 @@ components:
           type: string
           format: uuid
         sourceCurrency:
+          type: string
           minLength: 1
           pattern: "^[A-Z]{3}$"
-          type: string
         targetCurrency:
+          type: string
           minLength: 1
           pattern: "^[A-Z]{3}$"
-          type: string
         rate:
-          minimum: 0.0001
-          exclusiveMinimum: false
           type: number
+          minimum: 0.0001
         rateDate:
           type: string
           format: date-time
         rateProvider:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         rateType:
+          type: string
           minLength: 1
           pattern: ^(SPOT|FORWARD|FIXED)$
-          type: string
         markupPercentage:
+          type: number
           maximum: 100.00
-          exclusiveMaximum: false
           minimum: 0.00
-          exclusiveMinimum: false
-          type: number
         originalAmount:
-          minimum: 0.01
-          exclusiveMinimum: false
           type: number
+          minimum: 0.01
         convertedAmount:
-          minimum: 0.01
-          exclusiveMinimum: false
           type: number
-    PaymentCorrespondenceDTO:
+          minimum: 0.01
       required:
-      - correspondenceChannel
-      - correspondenceDate
-      - correspondenceDirection
-      - correspondenceType
-      - messageContent
+      - convertedAmount
+      - originalAmount
       - paymentOrderId
+      - rate
+      - rateDate
+      - rateProvider
+      - rateType
+      - sourceCurrency
+      - targetCurrency
+    PaymentCorrespondenceDTO:
       type: object
       properties:
         dateCreated:
@@ -4748,39 +6918,43 @@ components:
           type: string
           format: uuid
         correspondenceType:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         correspondenceDate:
           type: string
           format: date-time
         correspondenceChannel:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         correspondenceDirection:
+          type: string
           minLength: 1
           pattern: ^(INBOUND|OUTBOUND)$
-          type: string
         correspondentBank:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         correspondentReference:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         messageContent:
+          type: string
           maxLength: 2000
           minLength: 0
-          type: string
         attachmentId:
           type: string
           format: uuid
-    PaymentComplianceDTO:
       required:
+      - correspondenceChannel
+      - correspondenceDate
+      - correspondenceDirection
+      - correspondenceType
+      - messageContent
       - paymentOrderId
-      - screeningStatus
+    PaymentComplianceDTO:
       type: object
       properties:
         dateCreated:
@@ -4799,61 +6973,55 @@ components:
           type: string
           format: uuid
         screeningStatus:
+          type: string
           minLength: 1
           pattern: ^(PENDING|APPROVED|REJECTED|IN_PROGRESS)$
-          type: string
         screeningDate:
           type: string
           format: date-time
         screeningReference:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         riskScore:
-          maximum: 100
-          minimum: 0
           type: integer
           format: int32
+          maximum: 100
+          minimum: 0
         riskLevel:
-          pattern: ^(LOW|MEDIUM|HIGH|CRITICAL)$
           type: string
+          pattern: ^(LOW|MEDIUM|HIGH|CRITICAL)$
         complianceNotes:
+          type: string
           maxLength: 1000
           minLength: 0
-          type: string
         amlCheckStatus:
-          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
           type: string
+          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
         sanctionsCheckStatus:
-          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
           type: string
+          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
         pepCheckStatus:
-          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
           type: string
+          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
         kycCheckStatus:
-          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
           type: string
+          pattern: ^(PASS|FAIL|PENDING|NOT_APPLICABLE)$
         approvedBy:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         approvalDate:
           type: string
           format: date-time
         rejectionReason:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
-    PaymentOrderDTO:
       required:
-      - amount
-      - beneficiaryName
-      - currencyCode
-      - orderDate
-      - payerAccountId
-      - paymentMethodId
-      - paymentType
-      - status
+      - paymentOrderId
+      - screeningStatus
+    PaymentOrderDTO:
       type: object
       properties:
         dateCreated:
@@ -4878,29 +7046,29 @@ components:
           type: string
           format: uuid
         beneficiaryName:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         beneficiaryAccountNumber:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         beneficiaryIban:
+          type: string
           pattern: "^[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}$"
-          type: string
         beneficiaryBic:
-          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
           type: string
+          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
         beneficiaryAddress:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         beneficiaryCountryCode:
+          type: string
           pattern: "^[A-Z]{2}$"
-          type: string
         abaRoutingNumber:
-          pattern: "^[0-9]{9}$"
           type: string
+          pattern: "^[0-9]{9}$"
         paymentType:
           type: string
           enum:
@@ -4920,31 +7088,30 @@ components:
           - COMPLETED
           - FAILED
         amount:
-          minimum: 0.01
-          exclusiveMinimum: false
           type: number
+          minimum: 0.01
         currencyCode:
+          type: string
           minLength: 1
           pattern: "^[A-Z]{3}$"
-          type: string
         swiftBicCode:
-          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
           type: string
+          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
         remittanceInformation:
+          type: string
           maxLength: 140
           minLength: 0
-          type: string
         documentId:
           type: string
           format: uuid
         referenceNumber:
+          type: string
           maxLength: 35
           minLength: 0
-          type: string
         endToEndId:
+          type: string
           maxLength: 35
           minLength: 0
-          type: string
         priority:
           type: string
           enum:
@@ -4964,9 +7131,9 @@ components:
           - DONATION
           - OTHER
         purposeCode:
+          type: string
           maxLength: 10
           minLength: 0
-          type: string
         channel:
           type: string
           enum:
@@ -4983,12 +7150,11 @@ components:
           - INTERNATIONAL
           - INTERNAL
         exchangeRate:
-          minimum: 0.0001
-          exclusiveMinimum: false
           type: number
+          minimum: 0.0001
         chargeBearer:
-          pattern: ^(OUR|BEN|SHA)$
           type: string
+          pattern: ^(OUR|BEN|SHA)$
         beneficiaryType:
           type: string
           enum:
@@ -4996,53 +7162,55 @@ components:
           - BUSINESS
           - GOVERNMENT
         beneficiaryBankName:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         beneficiaryBankAddress:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         beneficiaryBankCountryCode:
-          pattern: "^[A-Z]{2}$"
           type: string
+          pattern: "^[A-Z]{2}$"
         intermediaryBankName:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         intermediaryBankBic:
-          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
           type: string
+          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
         intermediaryBankAccount:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         regulatoryReporting:
+          type: string
           maxLength: 1000
           minLength: 0
-          type: string
         taxInformation:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         batchId:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         valueDate:
           type: string
           format: date
         requestedExecutionDate:
           type: string
           format: date
-    PaymentMethodDTO:
       required:
-      - activeFlag
-      - methodName
-      - requiresIntermediaryBank
-      - requiresPurposeCode
-      - requiresRegulatoryReporting
-      - supportedCurrencies
+      - amount
+      - beneficiaryName
+      - currencyCode
+      - orderDate
+      - payerAccountId
+      - paymentMethodId
+      - paymentType
+      - status
+    PaymentMethodDTO:
       type: object
       properties:
         dateCreated:
@@ -5058,34 +7226,32 @@ components:
           format: uuid
           readOnly: true
         methodName:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         description:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         activeFlag:
           type: boolean
         processingTimeHours:
-          maximum: 8760
-          minimum: 0
           type: integer
           format: int32
+          maximum: 8760
+          minimum: 0
         minAmount:
-          minimum: 0.00
-          exclusiveMinimum: false
           type: number
+          minimum: 0.00
         maxAmount:
-          minimum: 0.00
-          exclusiveMinimum: false
           type: number
+          minimum: 0.00
         supportedCurrencies:
-          maxItems: 10
-          minItems: 1
           type: array
           items:
             type: string
+          maxItems: 10
+          minItems: 1
         requiresIntermediaryBank:
           type: boolean
         requiresRegulatoryReporting:
@@ -5098,12 +7264,14 @@ components:
           - NORMAL
           - HIGH
           - URGENT
-    PaymentBeneficiaryDTO:
       required:
-      - beneficiaryName
-      - beneficiaryType
-      - isFavorite
-      - payerAccountId
+      - activeFlag
+      - methodName
+      - requiresIntermediaryBank
+      - requiresPurposeCode
+      - requiresRegulatoryReporting
+      - supportedCurrencies
+    PaymentBeneficiaryDTO:
       type: object
       properties:
         dateCreated:
@@ -5122,9 +7290,9 @@ components:
           type: string
           format: uuid
         beneficiaryName:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         beneficiaryType:
           type: string
           enum:
@@ -5132,60 +7300,66 @@ components:
           - BUSINESS
           - GOVERNMENT
         beneficiaryAccountNumber:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         beneficiaryIban:
+          type: string
           pattern: "^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$"
-          type: string
         beneficiaryBic:
-          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
           type: string
+          pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
         beneficiaryAddress:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         beneficiaryCity:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         beneficiaryPostalCode:
+          type: string
           pattern: "^[A-Z0-9]{3,10}$"
-          type: string
         beneficiaryCountryCode:
-          pattern: "^[A-Z]{2}$"
           type: string
+          pattern: "^[A-Z]{2}$"
         beneficiaryEmail:
-          maxLength: 255
-          minLength: 0
           type: string
           format: email
-        beneficiaryPhone:
-          pattern: "^\\+?[1-9]\\d{1,14}$"
-          type: string
-        beneficiaryTaxId:
-          maxLength: 50
-          minLength: 0
-          type: string
-        beneficiaryBankName:
           maxLength: 255
           minLength: 0
+        beneficiaryPhone:
           type: string
+          pattern: "^\\+?[1-9]\\d{1,14}$"
+        beneficiaryTaxId:
+          type: string
+          maxLength: 50
+          minLength: 0
+        beneficiaryBankName:
+          type: string
+          maxLength: 255
+          minLength: 0
         beneficiaryBankAddress:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         beneficiaryBankCountryCode:
-          pattern: "^[A-Z]{2}$"
           type: string
+          pattern: "^[A-Z]{2}$"
         isFavorite:
           type: boolean
         nickname:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
+      required:
+      - beneficiaryName
+      - beneficiaryType
+      - isFavorite
+      - payerAccountId
     Create:
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -5206,7 +7380,6 @@ components:
         customerNotAfterEpochMillis:
           type: integer
           format: int64
-      additionalProperties: false
     View:
       type: object
       properties:
@@ -5253,6 +7426,7 @@ components:
           - COMMITTING
           - CANCELLING
           - COMPLETED
+          - REVERSING
           - REVERSED
           - CANCELLED
           - EXPIRED
@@ -5290,6 +7464,7 @@ components:
           format: date-time
     Recovery:
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -5297,9 +7472,9 @@ components:
         expectedVersion:
           type: integer
           format: int64
-      additionalProperties: false
     Failure:
       type: object
+      additionalProperties: false
       properties:
         effectId:
           type: string
@@ -5318,9 +7493,9 @@ components:
           - PEER_REJECTED
           - INCONSISTENT_OBSERVATION
           - RETRY_EXHAUSTED
-      additionalProperties: false
     Decision:
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -5330,12 +7505,13 @@ components:
           enum:
           - CONFIRM
           - CANCEL
+          - REVERSE
         expectedVersion:
           type: integer
           format: int64
-      additionalProperties: false
     Claim:
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -5343,7 +7519,6 @@ components:
         expectedVersion:
           type: integer
           format: int64
-      additionalProperties: false
     EffectClaim:
       type: object
       properties:
@@ -5360,6 +7535,7 @@ components:
           - COMMIT
           - RELEASE
           - OBSERVE
+          - REVERSE
         participantActionId:
           type: string
           format: uuid
@@ -5376,6 +7552,7 @@ components:
           $ref: "#/components/schemas/View"
     Acknowledge:
       type: object
+      additionalProperties: false
       properties:
         effectId:
           type: string
@@ -5386,14 +7563,9 @@ components:
         expectedVersion:
           type: integer
           format: int64
-      additionalProperties: false
     Quiesce:
-      required:
-      - actionId
-      - closureId
-      - enrollmentId
-      - expectedFenceVersion
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -5407,7 +7579,11 @@ components:
         expectedFenceVersion:
           type: integer
           format: int64
-      additionalProperties: false
+      required:
+      - actionId
+      - closureId
+      - enrollmentId
+      - expectedFenceVersion
     QuiescenceReceipt:
       type: object
       properties:
@@ -5456,11 +7632,8 @@ components:
         currencyPolicy:
           type: string
     Release:
-      required:
-      - actionId
-      - closureId
-      - expectedFenceVersion
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -5471,7 +7644,10 @@ components:
         expectedFenceVersion:
           type: integer
           format: int64
-      additionalProperties: false
+      required:
+      - actionId
+      - closureId
+      - expectedFenceVersion
     ReleaseReceipt:
       type: object
       properties:
@@ -5584,6 +7760,7 @@ components:
           - COMMITTING
           - CANCELLING
           - COMPLETED
+          - REVERSING
           - REVERSED
           - CANCELLED
           - EXPIRED
@@ -5704,33 +7881,26 @@ components:
           format: date-time
     PaginationResponse:
       type: object
+      description: Represents a paginated response containing a list of items and
+        pagination metadata.
       properties:
         content:
           type: array
           description: The list of items for the current page.
-          items:
-            type: object
-            description: The list of items for the current page.
+          items: {}
         totalElements:
           type: integer
-          description: The total number of elements across all pages.
           format: int64
+          description: The total number of elements across all pages.
         totalPages:
           type: integer
-          description: The total number of pages based on the data size and page size.
           format: int32
+          description: The total number of pages based on the data size and page size.
         currentPage:
           type: integer
-          description: "The current page number, typically zero-based."
           format: int32
-      description: Represents a paginated response containing a list of items and
-        pagination metadata.
+          description: "The current page number, typically zero-based."
     PaymentAuditDTO:
-      required:
-      - action
-      - actionBy
-      - actionDate
-      - paymentOrderId
       type: object
       properties:
         dateCreated:
@@ -5752,35 +7922,40 @@ components:
           type: string
           format: uuid
         action:
+          type: string
           maxLength: 100
           minLength: 0
-          type: string
         actionDate:
           type: string
           format: date-time
         actionBy:
+          type: string
           maxLength: 255
           minLength: 0
-          type: string
         previousStatus:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         newStatus:
+          type: string
           maxLength: 50
           minLength: 0
-          type: string
         ipAddress:
-          pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"
           type: string
+          pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"
         userAgent:
+          type: string
           maxLength: 500
           minLength: 0
-          type: string
         additionalInfo:
+          type: string
           maxLength: 1000
           minLength: 0
-          type: string
+      required:
+      - action
+      - actionBy
+      - actionDate
+      - paymentOrderId
   securitySchemes:
     managedPaymentBearer:
       type: http

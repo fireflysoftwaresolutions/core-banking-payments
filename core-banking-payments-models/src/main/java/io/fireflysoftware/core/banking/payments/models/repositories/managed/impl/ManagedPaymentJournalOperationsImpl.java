@@ -17,6 +17,7 @@ public class ManagedPaymentJournalOperationsImpl implements ManagedPaymentJourna
     public Mono<ManagedPaymentOperationEntity> insertOperation(ManagedPaymentOperationEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentActionEntity> insertAction(ManagedPaymentActionEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentEffectEntity> insertEffect(ManagedPaymentEffectEntity row) { return operations.insert(row); }
+    public Mono<ManagedPaymentMonetaryProofEntity> insertMonetaryProof(ManagedPaymentMonetaryProofEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentProjectionEntity> insertProjection(ManagedPaymentProjectionEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentHistoryEntity> insertHistory(ManagedPaymentHistoryEntity row) { return operations.insert(row); }
     public Mono<ManagedPaymentOutboxEntity> insertOutbox(ManagedPaymentOutboxEntity row) { return operations.insert(row); }

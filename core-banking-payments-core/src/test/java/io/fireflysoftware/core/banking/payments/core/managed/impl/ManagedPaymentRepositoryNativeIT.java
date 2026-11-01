@@ -93,7 +93,7 @@ class ManagedPaymentRepositoryNativeIT {
         journal = factory.getRepository(ManagedPaymentJournalRepository.class,
                 RepositoryFragments.just(new ManagedPaymentJournalOperationsImpl(template)));
         context = new ManagedPaymentDatabaseContext(template, nativeRepository);
-        store = new ManagedPaymentStore(operations, actions, effects, histories, journal, nativeRepository);
+        store = new ManagedPaymentStore(operations, actions, effects, histories, factory.getRepository(ManagedPaymentMonetaryProofRepository.class), journal, nativeRepository);
         tx = TransactionalOperator.create(new R2dbcTransactionManager(pool));
     }
 

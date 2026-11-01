@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
 
-@Table("managed_payment_operation")
+@Table(name = "managed_payment_operation", schema = "public")
 public record ManagedPaymentOperationEntity(
         @Id @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY) ManagedPaymentIds.OperationId id,
         UUID sourceAccountId,

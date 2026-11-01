@@ -60,6 +60,9 @@ class ManagedPaymentsRuntimeDatabaseTest {
             s.execute(
                     "CREATE ROLE payment_runtime LOGIN NOSUPERUSER NOBYPASSRLS PASSWORD"
                             + " 'owned-disposable-runtime'");
+            s.execute("REVOKE CREATE,TEMPORARY ON DATABASE owned_managed_payments FROM PUBLIC");
+            s.execute("GRANT CONNECT ON DATABASE owned_managed_payments TO payment_runtime");
+            s.execute("REVOKE CREATE ON SCHEMA public FROM PUBLIC");
             s.execute("GRANT USAGE ON SCHEMA public TO payment_runtime");
             s.execute(
                     "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT,INSERT,UPDATE,DELETE ON"
@@ -1467,7 +1470,7 @@ class ManagedPaymentsRuntimeDatabaseTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    void observedCompletionAndReversalRetainTheirDistinctHistoryAndPostingLinks() throws Exception {
+    void genericReversedObservationRetainsCommitIdentityAndRequiresReconciliation() throws Exception {
         var w = beginOwnedWork(30);
         var held = acknowledge(w, claim(w, 0));
         assertThat(held.statusCode()).as(held.body()).isEqualTo(200);
@@ -1512,14 +1515,23 @@ class ManagedPaymentsRuntimeDatabaseTest {
         String reversal = java.util.UUID.randomUUID().toString();
         row.put("reversalId", reversal);
         var reversed = acknowledge(w, observation);
-        assertThat(reversed.statusCode()).as(reversed.body()).isEqualTo(200);
+        assertThat(reversed.statusCode()).as(reversed.body()).isEqualTo(202);
         var finalView = json.readTree(reversed.body());
-        assertThat(finalView.path("state").asText()).isEqualTo("REVERSED");
+        assertThat(finalView.path("state").asText()).isEqualTo("RECOVERY_REQUIRED");
+        assertThat(finalView.path("recoveryCode").asText()).isEqualTo("INCONSISTENT_OBSERVATION");
+        assertThat(finalView.path("pendingEffectId")).isEqualTo(observation.path("effectId"));
         assertThat(finalView.path("postingId")).isEqualTo(complete.path("postingId"));
-        assertThat(finalView.path("reversalId").asText()).isEqualTo(reversal);
+        assertThat(finalView.path("reservationId")).isEqualTo(complete.path("reservationId"));
+        assertThat(finalView.path("ledgerVersion")).isEqualTo(complete.path("ledgerVersion"));
+        assertThat(finalView.path("observedAt")).isEqualTo(complete.path("observedAt"));
+        assertThat(finalView.path("ledgerState")).isEqualTo(complete.path("ledgerState"));
+        assertThat(finalView.path("reversalId").isNull()).isTrue();
+        var retained = call("GET", w.root(), null, w.auth());
+        assertThat(retained.statusCode()).as(retained.body()).isEqualTo(200);
+        assertThat(json.readTree(retained.body())).isEqualTo(finalView);
         var history = call("GET", w.root() + "/history", null, w.auth());
         assertThat(history.statusCode()).as(history.body()).isEqualTo(200);
-        assertThat(history.body()).contains("LEDGER_COMMITTED", "LEDGER_REVERSED");
+        assertThat(history.body()).contains("LEDGER_COMMITTED", "EFFECT_UNCERTAIN").doesNotContain("LEDGER_REVERSED");
     }
 
     @Test

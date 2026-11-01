@@ -11,6 +11,7 @@ public interface ManagedPaymentJournalOperations {
     Mono<ManagedPaymentOperationEntity> insertOperation(ManagedPaymentOperationEntity row);
     Mono<ManagedPaymentActionEntity> insertAction(ManagedPaymentActionEntity row);
     Mono<ManagedPaymentEffectEntity> insertEffect(ManagedPaymentEffectEntity row);
+    Mono<ManagedPaymentMonetaryProofEntity> insertMonetaryProof(ManagedPaymentMonetaryProofEntity row);
     Mono<ManagedPaymentProjectionEntity> insertProjection(ManagedPaymentProjectionEntity row);
     Mono<ManagedPaymentHistoryEntity> insertHistory(ManagedPaymentHistoryEntity row);
     Mono<ManagedPaymentOutboxEntity> insertOutbox(ManagedPaymentOutboxEntity row);

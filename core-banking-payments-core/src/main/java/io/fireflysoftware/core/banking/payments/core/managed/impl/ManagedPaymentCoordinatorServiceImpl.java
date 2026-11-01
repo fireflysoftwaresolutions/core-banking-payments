@@ -72,11 +72,13 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
                     case COMMIT -> "payments:confirm";
                     case RELEASE -> "payments:cancel";
                     case OBSERVE -> "payments:recover";
+                    case REVERSE -> "payments:reverse";
                 };
         require(
                 call,
                 tenant,
-                call.principal().hasScope(scope) ? scope : "payments:recover",
+                e.kind() == EffectKind.REVERSE ? scope
+                        : call.principal().hasScope(scope) ? scope : "payments:recover",
                 v.sourceAccountId(),
                 v.destinationAccountId());
         require(
@@ -87,6 +89,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
                     case COMMIT -> "funds:commit";
                     case RELEASE -> "funds:release";
                     case OBSERVE -> "funds:read";
+                    case REVERSE -> "funds:reverse";
                 },
                 v.sourceAccountId(),
                 v.destinationAccountId());
@@ -266,6 +269,7 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
                                                                                                                                                         case OBSERVE ->
                                                                                                                                                                 v
                                                                                                                                                                         .state();
+                                                                                                                                                        case REVERSE -> State.REVERSING;
                                                                                                                                                     };
                                                                                                                                     View
                                                                                                                                             next =
@@ -491,16 +495,20 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
                                     || input.expectedVersion() == null
                                     || input.expectedVersion() < 0)
                                 return Mono.error(fail(400, "EXACT_PAYMENT_DECISION_REQUIRED"));
-                            String scope =
-                                    input.kind() == DecisionKind.CONFIRM
-                                            ? "payments:confirm"
-                                            : "payments:cancel";
-                            String funds =
-                                    input.kind() == DecisionKind.CONFIRM
-                                            ? "funds:commit"
-                                            : "funds:release";
+                            String scope = switch (input.kind()) {
+                                case CONFIRM -> "payments:confirm";
+                                case CANCEL -> "payments:cancel";
+                                case REVERSE -> "payments:reverse";
+                            };
+                            String funds = switch (input.kind()) {
+                                case CONFIRM -> "funds:commit";
+                                case CANCEL -> "funds:release";
+                                case REVERSE -> "funds:reverse";
+                            };
                             require(call, tenant, scope);
                             require(call, tenant, funds);
+                            if (input.kind() == DecisionKind.REVERSE)
+                                return reverse(call, tenant, payment, input);
                             String kind = input.kind().name();
                             String hash =
                                     digest(kind + "|" + payment + "|" + input.expectedVersion());
@@ -625,6 +633,97 @@ public class ManagedPaymentCoordinatorServiceImpl implements ManagedPaymentCoord
                                                                                         }));
                                                             }));
                         });
+    }
+
+    record ReversePrepared(View payment, ManagedPaymentStore.CommitOrigin origin, boolean replay) {}
+
+    private static void reverseAuthority(Call call, String tenant, View payment) {
+        for (String scope : Set.of("payments:reverse", "funds:reverse", "funds:read", "funds:reconcile"))
+            require(call, tenant, scope, payment.sourceAccountId(), payment.destinationAccountId());
+    }
+
+    private static void reversible(View payment, Long expectedVersion) {
+        version(payment, expectedVersion);
+        if (payment.state() != State.COMPLETED || !"COMMITTED".equals(payment.ledgerState())
+                || payment.pendingEffectId() != null || payment.reservationId() == null
+                || payment.postingId() == null || payment.reversalId() != null
+                || payment.ledgerVersion() == null || payment.ledgerVersion() < 1)
+            throw fail(409, "COMPLETED_PAYMENT_COMMIT_REQUIRED");
+        if (payment.version() == Long.MAX_VALUE) throw fail(409, "PAYMENT_VERSION_EXHAUSTED");
+    }
+
+    private static void originalCommit(View payment, ManagedPaymentStore.CommitOrigin origin) {
+        var e = origin.effect(); var h = origin.history();
+        if (e.kind() != EffectKind.COMMIT || !"ACKNOWLEDGED".equals(e.state())
+                || !Objects.equals(h.effectId(), e.id()) || !"LEDGER_COMMITTED".equals(h.type())
+                || h.state() != State.COMPLETED || h.version() < 0 || h.version() > payment.version()
+                || !Objects.equals(h.postingId(), payment.postingId()) || h.reversalId() != null)
+            throw fail(409, "RETAINED_PAYMENT_COMMIT_ORIGIN_REQUIRED");
+    }
+
+    private Mono<View> reverse(Call call, String tenant, UUID payment, Decision input) {
+        require(call, tenant, "funds:read"); require(call, tenant, "funds:reconcile");
+        String hash = digest("REVERSE|" + payment + "|" + input.expectedVersion());
+        return transactions.transaction(call, tenant, "READ", "payments:reverse", accounts(call),
+                () -> store.gate(tenant, payment).then(store.read(tenant, payment)
+                        .switchIfEmpty(Mono.error(fail(404, "MANAGED_PAYMENT_NOT_FOUND"))))
+                        .flatMap(view -> {
+                            reverseAuthority(call, tenant, view);
+                            return store.action(tenant, input.actionId()).map(action -> {
+                                retained(action, payment, "REVERSE", hash);
+                                return new ReversePrepared(view, null, true);
+                            }).switchIfEmpty(Mono.defer(() -> {
+                                reversible(view, input.expectedVersion());
+                                return store.commitOrigin(view).map(origin -> {
+                                    originalCommit(view, origin);
+                                    return new ReversePrepared(view, origin, false);
+                                });
+                            }));
+                        }))
+                .flatMap(prepared -> {
+                    if (prepared.replay()) return Mono.just(prepared.payment());
+                    var expectation = new LedgerFundsObservationPort.MonetaryExpectation(
+                            LedgerFundsObservationPort.MonetaryKind.COMMIT,
+                            prepared.origin().effect().participant(), null, null, null, null,
+                            prepared.payment().ledgerVersion());
+                    return transactions.ledger.observeMonetary(tenant, prepared.payment(), expectation)
+                            .onErrorMap(LedgerFundsObservationPort.ObservationUnavailable.class,
+                                    error -> fail(503, "VERIFIED_PAYMENT_COMMIT_PROOF_UNAVAILABLE"))
+                            .flatMap(observed -> transactions.transaction(call, tenant, "OBSERVE", "payments:reverse", accounts(call),
+                                    () -> store.gate(tenant, payment)
+                                            .then(store.accountGates(tenant, prepared.payment().sourceAccountId(),
+                                                    prepared.payment().destinationAccountId()))
+                                            .then(store.read(tenant, payment)
+                                                    .switchIfEmpty(Mono.error(fail(404, "MANAGED_PAYMENT_NOT_FOUND"))))
+                                            .flatMap(view -> {
+                                                reverseAuthority(call, tenant, view);
+                                                return store.action(tenant, input.actionId()).map(action -> {
+                                                    retained(action, payment, "REVERSE", hash); return view;
+                                                }).switchIfEmpty(Mono.defer(() -> {
+                                                    reversible(view, input.expectedVersion());
+                                                    return store.commitOrigin(view).flatMap(origin -> {
+                                                        originalCommit(view, origin);
+                                                        if (!origin.equals(prepared.origin()))
+                                                            return Mono.error(fail(409, "PAYMENT_COMMIT_ORIGIN_CHANGED"));
+                                                        if (observed.commit() == null || observed.reversal() != null
+                                                                || !"COMMITTED".equals(observed.funds().ledgerState())
+                                                                || !Objects.equals(observed.commit().participantActionId(), origin.effect().participant())
+                                                                || !Objects.equals(observed.commit().reservationId(), view.reservationId())
+                                                                || !Objects.equals(observed.commit().postingId(), view.postingId()))
+                                                            return Mono.error(fail(409, "EXACT_PAYMENT_MONETARY_PROOF_REQUIRED"));
+                                                        return store.insertReverseEffect(view, origin).flatMap(effect -> {
+                                                            View next = evolve(view, State.REVERSING, effect.id(), null);
+                                                            return store.retainMonetaryProof(next, origin.effect(), observed.commit(),
+                                                                            observed.funds(), call.principal().subject())
+                                                                    .then(store.insertAction(next, input.actionId(), "REVERSE", hash,
+                                                                            call.principal().subject(), null))
+                                                                    .then(store.save(next, "REVERSE_ACCEPTED", call.principal().subject(),
+                                                                            input.actionId(), effect.id())).thenReturn(next);
+                                                        });
+                                                    });
+                                                }));
+                                            })));
+                });
     }
 
     public Mono<View> recover(String tenant, UUID payment, Recovery input) {
